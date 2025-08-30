@@ -1,0 +1,45 @@
+﻿@{
+    Layout = null;
+    var title = ViewBag.Title ?? "Green-Cycle";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title - Green-Cycle</title>
+    @Styles.Render("~/Content/css")
+</head>
+<body>
+    <header class="gc-header">
+        <div class="container">
+            <a class="brand" href="@Url.Action("Index", "Home")">
+                <img src="~/Content/images/logo.png" alt="Green-Cycle" height="28" />
+                <span>Green-Cycle</span>
+            </a>
+            <nav class="gc-nav">
+                @Html.ActionLink("Home", "Index", "Home")
+                @Html.ActionLink("Posts", "Index", "Post")
+                @Html.ActionLink("Events", "Index", "Event")
+                @Html.ActionLink("Leaderboard", "Index", "Leaderboard")
+                @Html.ActionLink("Dashboard", "Index", "Dashboard")
+                @* add login/logout partial later *@
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <footer class="gc-footer">
+        <div class="container">
+            <small>© @DateTime.Now.Year Green-Cycle</small>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/lib")
+    @Scripts.Render("~/bundles/app")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
