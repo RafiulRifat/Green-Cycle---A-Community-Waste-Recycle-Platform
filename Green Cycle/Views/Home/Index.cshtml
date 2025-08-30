@@ -1,7 +1,134 @@
-﻿@{
+﻿@model Green_Cycle.Models.ViewModels.Home.HomeIndexViewModel
+@{
     ViewBag.Title = "Home";
 }
-<section class="hero">
-    <h1>Welcome to Green-Cycle</h1>
-    <p>Community waste & recycle platform.</p>
+
+<!-- Hero -->
+<section class="row align-items-center gy-4 gx-5 bg-white rounded-4 shadow-sm p-4 p-lg-5">
+    <div class="col-lg-6">
+        <h1 class="display-5 fw-bold text-dark lh-sm">
+            Identify waste in seconds. Track your impact. Join your community.
+        </h1>
+        <p class="lead text-muted mt-3">Identify, track, and categorize waste easily.</p>
+        <div class="mt-3 d-flex gap-3">
+            <a href="@Url.Action("Index","Event")" class="btn btn-success btn-lg px-4">Find Drop-off Points</a>
+            <a href="@Url.Action("Result","Recognition")" class="btn btn-outline-secondary btn-lg px-4">Try Recognition</a>
+        </div>
+    </div>
+    <div class="col-lg-6 text-center">
+        <!-- Inline SVG illustration instead of hero.png -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+             class="img-fluid hero-illustration" role="img" aria-label="Recycling illustration">
+            <style>
+                .skin {
+                    fill: #f9c9b6;
+                }
+
+                .shirt {
+                    fill: #198754;
+                }
+
+                .pants {
+                    fill: #1a1a1a;
+                }
+
+                .hair {
+                    fill: #0a0a0a;
+                }
+
+                .bin {
+                    fill: #198754;
+                }
+
+                .icon {
+                    fill: #ffffff;
+                }
+            </style>
+            <!-- Background circle -->
+            <circle cx="256" cy="256" r="256" fill="#f6fff8" />
+            <!-- Head -->
+            <circle class="skin" cx="280" cy="140" r="40" />
+            <!-- Hair -->
+            <path class="hair" d="M320 140c0 22-18 40-40 40s-40-18-40-40c0-25 20-45 45-45s35 20 35 45z" />
+            <!-- Body -->
+            <rect class="shirt" x="220" y="180" width="120" height="80" rx="20" />
+            <!-- Pants -->
+            <rect class="pants" x="220" y="260" width="40" height="120" />
+            <rect class="pants" x="300" y="260" width="40" height="120" />
+            <!-- Phone -->
+            <rect x="200" y="160" width="20" height="40" rx="3" fill="#fff" stroke="#000" stroke-width="2" />
+            <!-- Recycling Bin -->
+            <rect class="bin" x="360" y="260" width="100" height="120" rx="8" />
+            <!-- Recycling Symbol -->
+            <polygon class="icon" points="410,300 430,340 390,340" />
+            <polygon class="icon" points="430,320 450,360 410,360" />
+            <polygon class="icon" points="390,360 430,360 410,400" />
+        </svg>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="row text-center bg-white rounded-4 shadow-sm p-4 p-lg-5 mt-4">
+    <div class="col-md-4 mb-4">
+        <div class="fs-2">📍</div>
+        <h5 class="fw-semibold mt-2">Locate</h5>
+        <p class="text-muted m-0">Find recycling drop-off points near you.</p>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="fs-2">📷</div>
+        <h5 class="fw-semibold mt-2">Scan</h5>
+        <p class="text-muted m-0">Take a photo to recognize and categorize waste items.</p>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="fs-2">📊</div>
+        <h5 class="fw-semibold mt-2">Track</h5>
+        <p class="text-muted m-0">Monitor your environmental impact over time.</p>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="row text-center bg-white rounded-4 shadow-sm p-4 p-lg-5 mt-4">
+    <div class="col-md-4"><div class="stat-number">@Model.CO2Saved</div> <div class="text-muted">kg CO₂ Saved</div></div>
+    <div class="col-md-4"><div class="stat-number">@Model.ItemsRecycled</div> <div class="text-muted">Items Recycled</div></div>
+    <div class="col-md-4"><div class="stat-number">@Model.ChallengesJoined</div> <div class="text-muted">Challenges Joined</div></div>
+</section>
+
+<!-- Events & Posts -->
+<section class="row mt-4 g-4">
+    <div class="col-lg-6">
+        <div class="bg-white rounded-4 shadow-sm p-4">
+            <h4 class="mb-3 fw-bold">Upcoming Events</h4>
+            @foreach (var ev in Model.Events)
+            {
+                <div class="card border-0 shadow-sm mb-3 rounded-3">
+                    <div class="card-body d-flex align-items-start">
+                        <div class="me-3 fs-2">🗓️</div>
+                        <div>
+                            <div class="fw-semibold">@ev.Title</div>
+                            <div class="text-muted small">@ev.Date</div>
+                            <div class="text-muted small">@ev.Location</div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="text-muted small">No events yet — check back soon</div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="bg-white rounded-4 shadow-sm p-4 h-100">
+            <h4 class="mb-3 fw-bold">Community Posts</h4>
+            @foreach (var post in Model.Posts)
+            {
+                <div class="card border-0 shadow-sm mb-3 rounded-3">
+                    <div class="card-body">
+                        <div class="fw-semibold">@post.Title</div>
+                        <div class="text-muted small">By @post.Author · @post.Date</div>
+                        <p class="mb-2 text-muted">@post.Snippet</p>
+                        <a href="#" class="text-success fw-semibold">Read More</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 </section>

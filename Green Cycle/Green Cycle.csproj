@@ -122,6 +122,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Infrastructure\Filters\AdminOnlyAttribute.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
+    <Compile Include="Models\ViewModels\Home\HomeIndexViewModel.cs" />
     <Compile Include="Services\Implementations\EventService.cs" />
     <Compile Include="Services\Implementations\LeaderboardService.cs" />
     <Compile Include="Services\Implementations\NotificationService.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Services\Interfaces\IPostService.cs" />
     <Compile Include="Services\Interfaces\IRecognitionService.cs" />
     <Content Include="Content\css\admin.css" />
+    <Content Include="Content\css\bootstrap.min.css" />
     <Content Include="Content\css\dashboard.css" />
     <Content Include="Content\css\site.css" />
     <Compile Include="App_Start\Startup.Auth.cs" />
@@ -187,7 +189,6 @@
     <Content Include="Content\bootstrap-utilities.rtl.css" />
     <Content Include="Content\bootstrap-utilities.rtl.min.css" />
     <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\images\logo.png" />
