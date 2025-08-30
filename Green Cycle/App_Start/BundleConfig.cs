@@ -6,22 +6,31 @@ namespace Green_Cycle
     {
         public static void RegisterBundles(BundleCollection bundles)
         {
-            // CSS
-            bundles.Add(new StyleBundle("~/Content/css")
-                .Include("~/Content/css/site.css",
-                         "~/Content/css/dashboard.css",
-                         "~/Content/css/admin.css"));
+            // ---- CSS ----
+            bundles.Add(new StyleBundle("~/bundles/css").Include(
+                "~/Content/bootstrap.min.css",
+                "~/Content/css/site.css",
+                "~/Content/css/dashboard.css",
+                "~/Content/css/admin.css"
+            ));
 
-            // Vendor JS
-            bundles.Add(new ScriptBundle("~/bundles/lib")
-                .Include("~/Scripts/lib/jquery-3.7.1.js",
-                         "~/Scripts/lib/bootstrap.js"));
+            // ---- Vendor JS (minimal safe set) ----
+            bundles.Add(new ScriptBundle("~/bundles/lib").Include(
+                "~/Scripts/jquery-{version}.js",
+                "~/Scripts/bootstrap.bundle.min.js"
+            ));
 
-            // App JS
-            bundles.Add(new ScriptBundle("~/bundles/app")
-                .Include("~/Scripts/app/validation.js"));
+            // ---- App JS ----
+            bundles.Add(new ScriptBundle("~/bundles/app").Include(
+                "~/Scripts/app/validation.js"
+            ));
 
-            BundleTable.EnableOptimizations = true;
+            // ---- Disable minification in Debug (Option A) ----
+#if DEBUG
+            BundleTable.EnableOptimizations = false;   // prevents WebGrease crashes locally
+#else
+            BundleTable.EnableOptimizations = true;    // enable in Release
+#endif
         }
     }
 }
