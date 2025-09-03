@@ -252,6 +252,9 @@
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\Recognition\Result.cshtml" />
     <Content Include="Views\Leaderboard\Index.cshtml" />
+    <Content Include="Views\Home\home\Index.cshtml" />
+    <Content Include="Views\Home\home\Privacy.cshtml" />
+    <Content Include="Views\Home\home\Thanks.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
