@@ -43,16 +43,32 @@
                         <li class="nav-item">
                             @Html.ActionLink("Recognition", "Result", "Recognition", null, new { @class = "nav-link" })
                         </li>
-                        <!-- Added Privacy to the top navbar -->
                         <li class="nav-item">
                             @Html.ActionLink("Privacy", "Privacy", "Home", null, new { @class = "nav-link" })
                         </li>
-                        <li class="nav-item">
-                            @Html.ActionLink("Sign in", "Login", "Account", null, new { @class = "nav-link" })
-                        </li>
-                        <li class="nav-item">
-                            @Html.ActionLink("Sign Up", "Register", "Account", null, new { @class = "btn btn-success px-3 text-white" })
-                        </li>
+
+                        @if (Request.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link">Hello, @User.Identity.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-secondary">Log off</button>
+                                }
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                @Html.ActionLink("Sign in", "Login", "Account", null, new { @class = "nav-link" })
+                            </li>
+                            <li class="nav-item">
+                                @Html.ActionLink("Sign Up", "Register", "Account", null, new { @class = "btn btn-success px-3 text-white" })
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

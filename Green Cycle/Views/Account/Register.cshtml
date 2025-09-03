@@ -1,0 +1,44 @@
+@model Green_Cycle.Models.ViewModels.Account.RegisterViewModel
+@{
+    ViewBag.Title = "Sign up";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-lg-5">
+
+            <h2 class="fw-bold text-center mb-4">Create account</h2>
+
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.Email, new { @class = "form-label fw-semibold" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email" })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.Password, new { @class = "form-label fw-semibold" })
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                </div>
+
+                <div class="mb-4">
+                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label fw-semibold" })
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm password" })
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 py-2">Sign up</button>
+            }
+
+            <div class="text-center small mt-3">
+                Already have an account?
+                <a href="@Url.Action("Login","Account")" class="text-success fw-semibold text-decoration-none">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
