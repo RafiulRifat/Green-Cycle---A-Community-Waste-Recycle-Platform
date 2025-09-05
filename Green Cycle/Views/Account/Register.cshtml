@@ -14,18 +14,28 @@
             {
                 @Html.AntiForgeryToken()
 
+                <!-- Full Name -->
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.FullName, new { @class = "form-label fw-semibold" })
+                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Full name" })
+                    @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger small" })
+                </div>
+
+                <!-- Email -->
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Email, new { @class = "form-label fw-semibold" })
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email address" })
                     @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
                 </div>
 
+                <!-- Password -->
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Password, new { @class = "form-label fw-semibold" })
                     @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
                 </div>
 
+                <!-- Confirm Password -->
                 <div class="mb-4">
                     @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label fw-semibold" })
                     @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm password" })
