@@ -1,0 +1,35 @@
+@model Green_Cycle.Models.Entities.DropOffPoint
+@{
+    ViewBag.Title = "Drop-off Point";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2 class="fw-bold mb-4">@Model.Name</h2>
+
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Address</dt>
+            <dd class="col-sm-9">@Model.Address</dd>
+            <dt class="col-sm-3">Latitude</dt>
+            <dd class="col-sm-9">@Model.Latitude?.ToString("0.######")</dd>
+            <dt class="col-sm-3">Longitude</dt>
+            <dd class="col-sm-9">@Model.Longitude?.ToString("0.######")</dd>
+            <dt class="col-sm-3">Materials</dt>
+            <dd class="col-sm-9">
+                @if (string.IsNullOrWhiteSpace(Model.MaterialsAccepted))
+                {<span class="text-muted">—</span> }
+                else
+                {
+                    var mats = Model.MaterialsAccepted.Split(',').Select(s => s.Trim());
+                    foreach (var m in mats)
+                    {
+                        <span class="badge bg-light text-dark border me-1">@m</span>
+                    }
+                }
+            </dd>
+            <dt class="col-sm-3">Distance (km)</dt>
+            <dd class="col-sm-9">@Model.DistanceKm.ToString("0.0")</dd>
+        </dl>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
