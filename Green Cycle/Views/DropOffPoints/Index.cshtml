@@ -1,4 +1,4 @@
-@model IEnumerable<Green_Cycle.Models.Entities.DropOffPoint>
+@model Green_Cycle.Models.ViewModels.DropOffPoints.DropOffPointsIndexViewModel
 @{
     ViewBag.Title = "Drop-off Points";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,15 +9,15 @@
 <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
     @using (Html.BeginForm("Index", "DropOffPoints", FormMethod.Get, new { @class = "d-flex flex-wrap gap-2" }))
     {
-        <input type="text" name="search" value="@Request["search"]"
+        <input type="text" name="search" value="@Model.Search"
                class="form-control" placeholder="Search by name or address" />
 
         <select name="distance" class="form-select">
             <option value="">Distance: all</option>
-            <option value="1" @(Request["distance"] == "1" ? "selected" : "")>1 km</option>
-            <option value="5" @(Request["distance"] == "5" ? "selected" : "")>5 km</option>
-            <option value="10" @(Request["distance"] == "10" ? "selected" : "")>10 km</option>
-            <option value="25" @(Request["distance"] == "25" ? "selected" : "")>25 km</option>
+            <option value="1" @(Model.Distance == 1 ? "selected" : "")>1 km</option>
+            <option value="5" @(Model.Distance == 5 ? "selected" : "")>5 km</option>
+            <option value="10" @(Model.Distance == 10 ? "selected" : "")>10 km</option>
+            <option value="25" @(Model.Distance == 25 ? "selected" : "")>25 km</option>
         </select>
 
         <button type="submit" class="btn btn-outline-success">Filter</button>
@@ -37,23 +37,70 @@
         </tr>
     </thead>
     <tbody>
-        @if (!Model.Any())
+        @if (!Model.Items.Any())
         {
             <tr><td colspan="4" class="text-center text-muted">No drop-off points found.</td></tr>
         }
         else
         {
-            foreach (var item in Model)
+            foreach (var item in Model.Items)
             {
                 <tr>
                     <td>@item.Name</td>
                     <td>@item.Address</td>
                     <td>@item.DistanceKm.ToString("0.0")</td>
                     <td>
-                        <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-outline-secondary btn-sm">View</a>
+                        <a href="@Url.Action("Details", new { id = item.Id })"
+                           class="btn btn-outline-secondary btn-sm">View</a>
                     </td>
                 </tr>
             }
         }
     </tbody>
 </table>
+
+<!-- Footer with paging controls -->
+<div class="d-flex align-items-center justify-content-between">
+    @using (Html.BeginForm("Index", "DropOffPoints", FormMethod.Get, new { @class = "d-flex align-items-center gap-2" }))
+    {
+        @Html.Hidden("search", Model.Search)
+        @Html.Hidden("distance", Model.Distance)
+        @Html.Hidden("page", 1) <!-- reset to first page when page size changes -->
+
+        <select name="pageSize" class="form-select" style="width: 6rem;" onchange="this.form.submit()">
+            @{
+                var sizes = new[] { 10, 25, 50 };
+                foreach (var s in sizes)
+                {
+                    <option value="@s" @(Model.PageSize == s ? "selected" : "")>@s</option>
+                }
+            }
+        </select>
+        <span class="ms-2 text-muted">per page</span>
+        <span class="ms-3 text-muted">Page @Model.Page of @Model.TotalPages</span>
+    }
+
+    <div class="btn-group">
+        @{
+            var prevDisabled = Model.Page <= 1;
+            var nextDisabled = Model.Page >= Model.TotalPages || Model.TotalPages == 0;
+
+            var routeBase = new
+            {
+                search = Model.Search,
+                distance = Model.Distance,
+                pageSize = Model.PageSize
+            };
+        }
+
+        <a class="btn btn-outline-secondary @(prevDisabled ? "disabled" : "")"
+           href="@(!prevDisabled ? Url.Action("Index", new { routeBase.search, routeBase.distance, routeBase.pageSize, page = Model.Page - 1 }) : "#")">
+            Prev
+        </a>
+
+        <a class="btn btn-outline-secondary @(nextDisabled ? "disabled" : "")"
+           href="@(!nextDisabled ? Url.Action("Index", new { routeBase.search, routeBase.distance, routeBase.pageSize, page = Model.Page + 1 }) : "#")">
+            Next
+        </a>
+    </div>
+</div>

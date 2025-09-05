@@ -1,0 +1,69 @@
+﻿@model Green_Cycle.Models.ViewModels.DropOffPoints.CreateDropOffPointViewModel
+@{
+    ViewBag.Title = "Create Drop-off Point";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="fw-bold mb-4">Create Drop-off Point</h2>
+
+@* Success banner shown BEFORE the form to avoid Razor parse issues *@
+@if (Model != null && Model.Created)
+{
+    <div class="alert alert-success d-flex align-items-center rounded-3" role="alert">
+        <span class="me-2">✅</span>
+        <div>Drop-off point created.</div>
+    </div>
+}
+
+@using (Html.BeginForm("Create", "DropOffPoints", FormMethod.Post, new { @class = "mb-4" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger small" })
+
+    <!-- Name -->
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Name, new { @class = "form-label fw-semibold" })
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Name" })
+        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger small" })
+    </div>
+
+    <!-- Address -->
+    <div class="mb-3">
+        @Html.LabelFor(m => m.Address, new { @class = "form-label fw-semibold" })
+        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "Address" })
+        @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger small" })
+    </div>
+
+
+    <!-- Materials -->
+    <div class="mt-4">
+        <div class="form-label fw-semibold mb-2">Materials Accepted</div>
+        <div class="d-flex flex-wrap gap-2">
+            @{
+                var mats = (Model?.AvailableMaterials) ?? new List<string> { "Plastic", "Paper", "Glass", "Metal", "Organic", "E-Waste" };
+                var selected = (Model?.SelectedMaterials) ?? new List<string>();
+            }
+            @for (int i = 0; i < mats.Count; i++)
+            {
+                var mat = mats[i];
+                var id = "mat_" + i;
+                var isChecked = selected.Contains(mat);
+
+                <input type="checkbox"
+                       class="btn-check"
+                       id="@id"
+                       name="SelectedMaterials"
+                       value="@mat"
+                       @(isChecked ? "checked" : null) />
+                <label class="btn btn-outline-secondary rounded-pill px-3" for="@id">@mat</label>
+            }
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2 mt-4">
+        <button class="btn btn-success px-4" type="submit">Save</button>
+        <a class="btn btn-outline-secondary" href="@Url.Action("Index","DropOffPoints")">Cancel</a>
+    </div>
+}
