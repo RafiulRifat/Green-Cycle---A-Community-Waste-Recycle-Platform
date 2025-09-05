@@ -4,6 +4,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Data.Entity;                 // DbSet
+using Green_Cycle.Models.Entities;        // <-- for DropOffPoint
 
 namespace Green_Cycle.Models
 {
@@ -35,5 +37,8 @@ namespace Green_Cycle.Models
         {
             return new ApplicationDbContext();
         }
+
+        // ✅ App tables
+        public DbSet<DropOffPoint> DropOffPoints { get; set; }
     }
 }

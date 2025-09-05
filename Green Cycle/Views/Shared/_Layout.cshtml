@@ -1,5 +1,8 @@
 ﻿@{
     var title = ViewBag.Title ?? "Green-Cycle";
+    Func<string, string, bool> isActive = (ctrl, act) =>
+        string.Equals((string)ViewContext.RouteData.Values["controller"], ctrl, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals((string)ViewContext.RouteData.Values["action"], act, StringComparison.OrdinalIgnoreCase);
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -37,13 +40,16 @@
                 <div class="collapse navbar-collapse justify-content-end" id="mainNav">
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item">
-                            @Html.ActionLink("Drop-off Points", "Index", "Event", null, new { @class = "nav-link" })
+                            @Html.ActionLink("Drop-off Points", "Index", "DropOffPoints", null,
+                                new { @class = "nav-link " + (isActive("DropOffPoints", "Index") ? "active" : "") })
                         </li>
                         <li class="nav-item">
-                            @Html.ActionLink("Recognition", "Result", "Recognition", null, new { @class = "nav-link" })
+                            @Html.ActionLink("Recognition", "Result", "Recognition", null,
+                                new { @class = "nav-link " + (isActive("Recognition", "Result") ? "active" : "") })
                         </li>
                         <li class="nav-item">
-                            @Html.ActionLink("Privacy", "Privacy", "Home", null, new { @class = "nav-link" })
+                            @Html.ActionLink("Privacy", "Privacy", "Home", null,
+                                new { @class = "nav-link " + (isActive("Home", "Privacy") ? "active" : "") })
                         </li>
 
                         @if (Request.IsAuthenticated)
@@ -52,7 +58,8 @@
                                 <span class="nav-link">Hello, @User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
-                                @Html.ActionLink("Manage Profile", "Manage", "Account", null, new { @class = "nav-link" })
+                                @Html.ActionLink("Manage Profile", "Manage", "Account", null,
+                                    new { @class = "nav-link " + (isActive("Account", "Manage") ? "active" : "") })
                             </li>
                             <li class="nav-item">
                                 @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))

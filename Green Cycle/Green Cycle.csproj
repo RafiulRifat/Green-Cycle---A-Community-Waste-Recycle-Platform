@@ -159,6 +159,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\DropOffPointsController.cs" />
     <Compile Include="Infrastructure\Filters\AdminOnlyAttribute.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
     <Compile Include="Migrations\202509031600424_InitialCreate.cs" />
@@ -173,10 +174,20 @@
     <Compile Include="Migrations\202509051002173_SnapshotSync.Designer.cs">
       <DependentUpon>202509051002173_SnapshotSync.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202509051313575_AddDropOffPoints.cs" />
+    <Compile Include="Migrations\202509051313575_AddDropOffPoints.Designer.cs">
+      <DependentUpon>202509051313575_AddDropOffPoints.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509051316335_AddDropOffPoints1.cs" />
+    <Compile Include="Migrations\202509051316335_AddDropOffPoints1.Designer.cs">
+      <DependentUpon>202509051316335_AddDropOffPoints1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Entities\DropOffPoint.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ViewModels\Account\ChangePasswordViewModel.cs" />
     <Compile Include="Models\ViewModels\Account\ManageProfileViewModel.cs" />
+    <Compile Include="Models\ViewModels\DropOffPoints\DropOffPointsIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\Home\HomeIndexViewModel.cs" />
     <Compile Include="Services\Implementations\EventService.cs" />
     <Compile Include="Services\Implementations\LeaderboardService.cs" />
@@ -311,6 +322,7 @@
     <Content Include="Views\Home\home\Privacy.cshtml" />
     <Content Include="Views\Home\home\Thanks.cshtml" />
     <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\DropOffPoints\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -354,6 +366,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202509051002173_SnapshotSync.resx">
       <DependentUpon>202509051002173_SnapshotSync.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509051313575_AddDropOffPoints.resx">
+      <DependentUpon>202509051313575_AddDropOffPoints.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509051316335_AddDropOffPoints1.resx">
+      <DependentUpon>202509051316335_AddDropOffPoints1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
