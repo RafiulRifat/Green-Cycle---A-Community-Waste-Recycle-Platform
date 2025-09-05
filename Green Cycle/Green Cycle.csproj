@@ -161,7 +161,22 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Infrastructure\Filters\AdminOnlyAttribute.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
+    <Compile Include="Migrations\202509031600424_InitialCreate.cs" />
+    <Compile Include="Migrations\202509031600424_InitialCreate.Designer.cs">
+      <DependentUpon>202509031600424_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509050942556_AddProfileFields.cs" />
+    <Compile Include="Migrations\202509050942556_AddProfileFields.Designer.cs">
+      <DependentUpon>202509050942556_AddProfileFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509051002173_SnapshotSync.cs" />
+    <Compile Include="Migrations\202509051002173_SnapshotSync.Designer.cs">
+      <DependentUpon>202509051002173_SnapshotSync.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\ViewModels\Account\ChangePasswordViewModel.cs" />
+    <Compile Include="Models\ViewModels\Account\ManageProfileViewModel.cs" />
     <Compile Include="Models\ViewModels\Home\HomeIndexViewModel.cs" />
     <Compile Include="Services\Implementations\EventService.cs" />
     <Compile Include="Services\Implementations\LeaderboardService.cs" />
@@ -295,6 +310,7 @@
     <Content Include="Views\Home\home\Index.cshtml" />
     <Content Include="Views\Home\home\Privacy.cshtml" />
     <Content Include="Views\Home\home\Thanks.cshtml" />
+    <Content Include="Views\Account\ChangePassword.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -328,6 +344,17 @@
     <Content Include="Scripts\bootstrap.bundle.js.map" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202509031600424_InitialCreate.resx">
+      <DependentUpon>202509031600424_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509050942556_AddProfileFields.resx">
+      <DependentUpon>202509050942556_AddProfileFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509051002173_SnapshotSync.resx">
+      <DependentUpon>202509051002173_SnapshotSync.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

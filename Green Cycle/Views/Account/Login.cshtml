@@ -14,21 +14,24 @@
             {
                 @Html.AntiForgeryToken()
 
+                <!-- Email -->
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Email, new { @class = "form-label fw-semibold" })
-                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email" })
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email address" })
                     @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
                 </div>
 
+                <!-- Password -->
                 <div class="mb-3">
                     @Html.LabelFor(m => m.Password, new { @class = "form-label fw-semibold" })
                     @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
                     @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
                 </div>
 
+                <!-- Remember me -->
                 <div class="form-check mb-3">
-                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
-                    @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
+                    @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input", id = "rememberMe" })
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
                 </div>
 
                 <button type="submit" class="btn btn-success w-100 py-2 mb-3">Sign in</button>
@@ -36,6 +39,7 @@
 
             <div class="text-center text-muted mb-3">or</div>
 
+            <!-- External login (Google example) -->
             <div class="d-grid mb-3">
                 <a href="@Url.Action("ExternalLogin", "Account", new { provider = "Google" })"
                    class="btn btn-outline-secondary w-100 py-2">
@@ -43,8 +47,9 @@
                 </a>
             </div>
 
+            <!-- Links -->
             <div class="d-flex justify-content-between small">
-                <a href="#" class="text-decoration-none">Forgot password?</a>
+                <a href="@Url.Action("ForgotPassword","Account")" class="text-decoration-none">Forgot password?</a>
                 <a href="@Url.Action("Register","Account")" class="fw-semibold text-success text-decoration-none">Sign up</a>
             </div>
         </div>

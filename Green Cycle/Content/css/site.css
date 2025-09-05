@@ -65,3 +65,12 @@ header a {
     font-weight: 600;
 }
 
+/* Manage Profile polish */
+.alert-success {
+    border-radius: 14px;
+}
+
+.input-group-text {
+    background: #eef6f0;
+    border-color: #dfe7e2;
+}
