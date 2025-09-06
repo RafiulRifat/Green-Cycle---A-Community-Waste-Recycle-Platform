@@ -1,0 +1,144 @@
+﻿@model GreenCycle.Models.ViewModels.RecognitionResultViewModel
+@{
+    ViewBag.Title = "Recognition Result";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .result-wrap {
+        max-width: 980px;
+        margin: 30px auto;
+        padding: 24px;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        background: #fff;
+        font-family: system-ui,Arial;
+    }
+
+    .result-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        gap: 28px;
+    }
+
+    .preview {
+        background: #eef9f0;
+        border-radius: 12px;
+        min-height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+        }
+
+    .label {
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0 0 8px;
+    }
+
+    .badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 13px;
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+    .badge-blue {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .badge-green {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .impact {
+        margin-top: 12px;
+        padding: 8px 12px;
+        background: #e6f9ef;
+        color: #166534;
+        border-radius: 8px;
+        display: inline-block;
+    }
+
+    .section-title {
+        margin-top: 14px;
+        font-weight: 700;
+    }
+
+    .btnrow {
+        margin-top: 20px;
+        display: flex;
+        gap: 14px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        text-decoration: none;
+        color: #111;
+    }
+
+    .btn-primary {
+        background: #0a7a3f;
+        color: #fff;
+        border: none;
+    }
+
+    .footer {
+        margin-top: 10px;
+        color: #6b7280;
+        font-size: 12px;
+    }
+</style>
+
+<div class="result-wrap">
+    <h2>Recognition Result</h2>
+    <div class="result-grid">
+        <div class="preview">
+            @if (!string.IsNullOrEmpty(Model.PreviewImagePath))
+            {
+                <img src="@Model.PreviewImagePath" alt="Preview" />
+            }
+            else
+            {
+                <span>Preview</span>
+            }
+        </div>
+        <div>
+            <div class="label">@Model.Label</div>
+            <div>
+                <span class="badge badge-blue">@($"{Model.Confidence:P0}")</span>
+                <span class="badge badge-green">@Model.Material</span>
+            </div>
+
+            <div class="impact">You saved @Model.SavedCO2.ToString("0.00") kg CO₂</div>
+
+            <div class="section-title">What to do</div>
+            <ul>
+                @foreach (var step in Model.Instructions)
+                {
+                    <li>@step</li>
+}
+            </ul>
+
+            <div class="footer">
+                Scanned: @Model.ScannedAt.ToString("MMM dd, yyyy, HH:mm")<br />
+                <a href="#">How we estimate CO₂</a>
+            </div>
+
+            <div class="btnrow">
+                <a href="@Url.Action("Index","Recognition")" class="btn">Scan Another</a>
+                <a href="@Url.Action("Impact","Dashboard")" class="btn btn-primary">View Impact Dashboard</a>
+            </div>
+        </div>
+    </div>
+</div>
