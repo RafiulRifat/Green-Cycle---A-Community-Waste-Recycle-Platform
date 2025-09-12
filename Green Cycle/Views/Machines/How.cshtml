@@ -1,0 +1,88 @@
+﻿@{
+    ViewBag.Title = "How to Use the Machine";
+}
+
+<div class="container">
+    <h2 class="fw-bold mb-3">How to Use the Machine</h2>
+    <p class="text-muted mb-4">Follow these simple steps to recycle your items</p>
+
+    <div class="row g-4">
+        <!-- Steps -->
+        <div class="col-md-6">
+            <ul class="list-unstyled">
+                <li class="mb-4 d-flex">
+                    <div class="me-3 fs-3 text-success">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <div>
+                        <strong>Locate a machine</strong><br />
+                        <span class="text-muted">Find a nearby recycling machine on the map</span>
+                    </div>
+                </li>
+
+                <li class="mb-4 d-flex">
+                    <div class="me-3 fs-3 text-success">
+                        <i class="bi bi-qr-code"></i>
+                    </div>
+                    <div>
+                        <strong>Scan the QR code</strong><br />
+                        <span class="text-muted">Open your app and scan the QR code on the machine to begin</span>
+                    </div>
+                </li>
+
+                <li class="mb-4 d-flex">
+                    <div class="me-3 fs-3 text-success">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div>
+                        <strong>Deposit items</strong><br />
+                        <span class="text-muted">Insert bottles, cans, or other recyclables into the slot</span>
+                    </div>
+                </li>
+
+                <li class="mb-4 d-flex">
+                    <div class="me-3 fs-3 text-success">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div>
+                        <strong>Earn rewards</strong><br />
+                        <span class="text-muted">Points will be added to your wallet automatically</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- QR & Info -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=DemoQR" alt="QR Code" class="mb-3" />
+                    <button class="btn btn-dark w-100">Scan QR Code</button>
+                    <small class="d-block mt-2 text-muted">For demo only – actual scan uses device camera</small>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold">INFO</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li>✔ Items must be empty and clean</li>
+                        <li>✔ Only accepted materials: Plastic bottles, Aluminum cans</li>
+                        <li>✖ Do not insert glass or non-recyclables</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Nearby","Machines")" class="btn btn-success btn-lg px-4">
+            Find Nearby Machines
+        </a>
+    </div>
+</div>
+
+@section scripts {
+    <!-- Bootstrap icons (for step icons) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+}

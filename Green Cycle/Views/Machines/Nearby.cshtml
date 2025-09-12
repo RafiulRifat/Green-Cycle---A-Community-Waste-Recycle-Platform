@@ -1,0 +1,139 @@
+@model IEnumerable<Green_Cycle.Models.ViewModels.Machines.MachineVm>
+@{
+    ViewBag.Title = "Nearby Machines";
+
+    var q = (Request["q"] ?? "").Trim();
+    var status = (Request["status"] ?? "").Trim();
+
+    Func<string, string> StatusBadge = s =>
+        s == "Full" ? "badge bg-danger"
+      : s == "Near Full" ? "badge bg-warning text-dark"
+      : s == "Cancelled" ? "badge bg-secondary"
+      : "badge bg-success"; // Available (default)
+}
+
+<div class="container">
+    <h2 class="fw-bold">Nearby Machines</h2>
+    <p class="text-muted">Find a recycling drop-off machine near you</p>
+
+    <!-- Filter bar -->
+    <form method="get" class="row gy-2 align-items-center mb-3" id="filterForm">
+        <div class="col-12 col-md-6">
+            <input class="form-control" type="text" name="q" value="@q" placeholder="Search by area or zone..." />
+        </div>
+        <div class="col-8 col-md-3">
+            <select class="form-select" name="status" id="statusSelect">
+                <option value="" @(string.IsNullOrEmpty(status) ? "selected" : null)>All statuses</option>
+                <option value="Available" @(status.Equals("Available", System.StringComparison.OrdinalIgnoreCase) ? "selected" : null)>Available</option>
+                <option value="NearFull" @(status.Equals("NearFull", System.StringComparison.OrdinalIgnoreCase) ? "selected" : null)>Near Full</option>
+                <option value="Full" @(status.Equals("Full", System.StringComparison.OrdinalIgnoreCase) ? "selected" : null)>Full</option>
+                <option value="Cancelled" @(status.Equals("Cancelled", System.StringComparison.OrdinalIgnoreCase) ? "selected" : null)>Cancelled</option>
+            </select>
+        </div>
+        <div class="col-4 col-md-3 text-end">
+            <div class="btn-group">
+                <button type="submit" class="btn btn-outline-secondary">List</button>
+                <button type="button" class="btn btn-outline-secondary" disabled title="Map shown below">Map</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Map -->
+    <div id="machinesMap" class="border rounded mb-4" style="height:360px;"></div>
+
+    <!-- Results -->
+    @if (!Model.Any())
+    {
+        <p class="fw-semibold text-muted">No machines found</p>
+    }
+    else
+    {
+        foreach (var m in Model)
+        {
+            var secondary = string.IsNullOrWhiteSpace(m.Address) ? $"Zone: {m.ZoneName}" : m.Address;
+
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        <div>
+                            <h5 class="fw-bold mb-1">@m.Code</h5>
+                            <small class="text-muted">@secondary</small>
+                        </div>
+                        <div class="d-flex gap-2 flex-shrink-0">
+                            <span class="@StatusBadge(m.Status)">@m.Status</span>
+                            <span class="badge bg-light text-dark">@m.FillPercent % full</span>
+                        </div>
+                    </div>
+
+                    <div class="progress mt-3" style="height:6px;">
+                        <div class="progress-bar" role="progressbar"
+                             style="width:@m.FillPercent%;"
+                             aria-valuenow="@m.FillPercent" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section scripts{
+    <script>
+  // submit on status change
+  document.getElementById('statusSelect')?.addEventListener('change', function () {
+      document.getElementById('filterForm').submit();
+  });
+
+  // ---- Leaflet map ----
+  // Build a lightweight array with only items that have coordinates
+  var machines = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+      Model.Where(x => x.Lat.HasValue && x.Lng.HasValue)
+           .Select(x => new {
+               x.Code, x.Address, x.ZoneName,
+               Status = x.Status,
+               Fill = x.FillPercent,
+               Lat = x.Lat, Lng = x.Lng
+           })
+  ));
+
+  // Default center (fallback if no points)
+  var defaultCenter = [23.8103, 90.4125]; // change to your city
+  var mapZoom = 12;
+
+  if (machines.length > 0) {
+      var avgLat = machines.reduce((s,m)=>s+m.Lat,0)/machines.length;
+      var avgLng = machines.reduce((s,m)=>s+m.Lng,0)/machines.length;
+      defaultCenter = [avgLat, avgLng];
+  }
+
+  var map = L.map('machinesMap').setView(defaultCenter, mapZoom);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  function iconFor(status){
+      var color = status === "Full" ? "red" : (status === "Near Full" ? "orange" : "green");
+      return L.divIcon({
+          className: "machine-marker",
+          html: `<div style="width:14px;height:14px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 0 2px rgba(0,0,0,.35)"></div>`,
+          iconSize: [14,14],
+          iconAnchor: [7,7]
+      });
+  }
+
+  var bounds = [];
+  machines.forEach(m => {
+      var marker = L.marker([m.Lat, m.Lng], { icon: iconFor(m.Status) }).addTo(map);
+      var line2 = (m.Address && m.Address.trim().length) ? m.Address : ("Zone: " + (m.ZoneName || ""));
+      marker.bindPopup(
+        `<strong>${m.Code}</strong><br/>${line2}<br/>Status: ${m.Status}, ${m.Fill}% full`
+      );
+      bounds.push([m.Lat, m.Lng]);
+  });
+
+  if (bounds.length > 1) {
+      map.fitBounds(bounds, { padding: [24,24] });
+  }
+    </script>
+}

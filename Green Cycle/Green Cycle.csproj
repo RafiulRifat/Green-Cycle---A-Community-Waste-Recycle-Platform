@@ -160,6 +160,17 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\DropOffPointsController.cs" />
+    <Compile Include="Controllers\IssuesController.cs" />
+    <Compile Include="Controllers\MachinesController.cs" />
+    <Compile Include="Controllers\RewardsController.cs" />
+    <Compile Include="Controllers\WalletController.cs" />
+    <Compile Include="Data\DbInitializer.cs" />
+    <Compile Include="Data\Migrations\202509121752179_Add_Zones_And_Machines.cs" />
+    <Compile Include="Data\Migrations\202509121752179_Add_Zones_And_Machines.Designer.cs">
+      <DependentUpon>202509121752179_Add_Zones_And_Machines.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Migrations\Configuration.cs" />
+    <Compile Include="IdentityMigrations\Configuration.cs" />
     <Compile Include="Infrastructure\Filters\AdminOnlyAttribute.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
     <Compile Include="Migrations\202509031600424_InitialCreate.cs" />
@@ -188,14 +199,23 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\DropOffPoint.cs" />
+    <Compile Include="Models\Entities\Hybrid\Machine.cs" />
+    <Compile Include="Models\Entities\Hybrid\Material.cs" />
+    <Compile Include="Models\Entities\Hybrid\ServiceZone.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ViewModels\Account\ChangePasswordViewModel.cs" />
     <Compile Include="Models\ViewModels\Account\ManageProfileViewModel.cs" />
     <Compile Include="Models\ViewModels\DropOffPoints\CreateDropOffPointViewModel.cs" />
     <Compile Include="Models\ViewModels\DropOffPoints\DropOffPointsIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\Home\HomeIndexViewModel.cs" />
+    <Compile Include="Models\ViewModels\Issues\IssueVm.cs" />
+    <Compile Include="Models\ViewModels\Machines\MachineVm.cs" />
     <Compile Include="Models\ViewModels\RecognitionResultViewModel.cs" />
     <Compile Include="Models\ViewModels\RecognitionViewModel.cs" />
+    <Compile Include="Models\ViewModels\Rewards\RedemptionVm.cs" />
+    <Compile Include="Models\ViewModels\Rewards\RewardVm.cs" />
+    <Compile Include="Models\ViewModels\Wallet\TransactionVm.cs" />
+    <Compile Include="Models\ViewModels\Wallet\WalletVm.cs" />
     <Compile Include="Services\Implementations\EventService.cs" />
     <Compile Include="Services\Implementations\LeaderboardService.cs" />
     <Compile Include="Services\Implementations\NotificationService.cs" />
@@ -333,11 +353,15 @@
     <Content Include="Views\DropOffPoints\Create.cshtml" />
     <Content Include="Views\DropOffPoints\Details.cshtml" />
     <Content Include="Views\Recognition\Index.cshtml" />
+    <Content Include="Views\Machines\Nearby.cshtml" />
+    <Content Include="Views\Machines\How.cshtml" />
+    <Content Include="Views\Issues\Raise.cshtml" />
+    <Content Include="Views\Rewards\Index.cshtml" />
+    <Content Include="Views\Wallet\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\images\icons\" />
-    <Folder Include="Data\Migrations\" />
     <Folder Include="Infrastructure\Helpers\" />
   </ItemGroup>
   <ItemGroup>
@@ -368,6 +392,9 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\Migrations\202509121752179_Add_Zones_And_Machines.resx">
+      <DependentUpon>202509121752179_Add_Zones_And_Machines.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202509031600424_InitialCreate.resx">
       <DependentUpon>202509031600424_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
