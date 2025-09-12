@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace GreenCycle.Controllers
 {
+    [Authorize]  // ✅ add this
     public class RecognitionController : Controller
     {
         private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png" };

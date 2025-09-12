@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace Green_Cycle.Controllers
 {
+    [Authorize]  // ✅ add this
     public class DropOffPointsController : Controller
     {
         private readonly ApplicationDbContext _db = new ApplicationDbContext();
