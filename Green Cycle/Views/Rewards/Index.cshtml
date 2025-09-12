@@ -1,0 +1,66 @@
+@model IEnumerable<Green_Cycle.Models.ViewModels.Rewards.RewardVm>
+@{
+    ViewBag.Title = "Rewards";
+    var balance = (int)(ViewBag.Balance ?? 0);
+    var redemptions = (IEnumerable<Green_Cycle.Models.ViewModels.Rewards.RedemptionVm>)(ViewBag.Redemptions ?? new List<Green_Cycle.Models.ViewModels.Rewards.RedemptionVm>());
+}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+<div class="container">
+    <h2 class="fw-bold">Rewards</h2>
+    <p class="text-muted">Redeem your points for exciting benefits.</p>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-wallet2 fs-3 text-secondary"></i>
+                <div>
+                    <div class="text-muted small">Current Balance</div>
+                    <div class="fs-4 fw-bold">@balance pts</div>
+                </div>
+            </div>
+            <a href="@Url.Action("Index","Wallet")" class="link-secondary">View full wallet</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        @foreach (var r in Model)
+        {
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <div class="bg-light rounded mb-3" style="height:180px;"></div>
+                        <div class="fw-bold">@r.Title</div>
+                        <div class="text-muted small mb-3">@r.Subtitle</div>
+                        <div class="mb-3">Cost: <strong>@r.CostPoints pts</strong></div>
+                        @using (Html.BeginForm("Redeem", "Rewards", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("id", r.Id)
+                            <button class="btn btn-outline-primary mt-auto">Redeem</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h4 class="fw-bold">My Redemptions</h4>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr><th>Reward</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var rd in redemptions)
+                {
+                    <tr>
+                        <td>@rd.RewardTitle</td>
+                        <td>@rd.Date</td>
+                        <td>@rd.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
