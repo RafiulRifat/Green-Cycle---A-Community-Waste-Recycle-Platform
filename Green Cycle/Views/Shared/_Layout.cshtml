@@ -6,7 +6,7 @@
         string.Equals((string)ViewContext.RouteData.Values["controller"], ctrl, StringComparison.OrdinalIgnoreCase) &&
         string.Equals((string)ViewContext.RouteData.Values["action"], act, StringComparison.OrdinalIgnoreCase);
 
-    // Area-aware helper (not used now but kept)
+    // Area-aware helper
     Func<string, string, string, bool> isActiveArea = (area, ctrl, act) =>
     {
         var routeArea = (string)(ViewContext.RouteData.DataTokens?["area"] ?? "");
@@ -14,6 +14,27 @@
             && string.Equals((string)ViewContext.RouteData.Values["controller"], ctrl, StringComparison.OrdinalIgnoreCase)
             && string.Equals((string)ViewContext.RouteData.Values["action"], act, StringComparison.OrdinalIgnoreCase);
     };
+
+    // Role flags
+    bool isAdmin = User?.IsInRole("Admin") ?? false;
+    bool isCollector = User?.IsInRole("Collector") ?? false;
+    bool isPlainUser = Request.IsAuthenticated && !isAdmin && !isCollector; // signed-in non-admin, non-collector
+    string roleLabel = isAdmin ? "Admin" : (isCollector ? "Collector" : (Request.IsAuthenticated ? "User" : null));
+
+    // ---- MOVE ALL INLINE SETUPS HERE (no @{ ... } inside ifs later) ----
+    bool isMachinesActive =
+        isActive("Machines", "Nearby") || isActive("Machines", "How");
+
+    bool collectorActive =
+        isActive("CollectorFeature", "Index") ||
+        isActive("DropOffPoints", "Create") ||
+        isActive("DropOffPoints", "Edit") ||
+        isActive("DropOffPoints", "Delete");
+
+    bool adminActive =
+        isActiveArea("Admin", "Dashboard", "Index") ||
+        isActiveArea("Admin", "Users", "Index") ||
+        isActiveArea("Admin", "Reports", "Index");
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -22,94 +43,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@title - Green-Cycle</title>
 
-    <!-- Bootstrap 5 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
-
-    <!-- Bootstrap Icons (used in Wallet/Rewards/Issues UIs) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-
-    <!-- Leaflet (map) CSS -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-Vt1qjDdG8LwobP2XnYc8e8lmKfssTZR0s7C6x2i5pLg="
           crossorigin="" />
-
-    <!-- Site styles -->
     <link rel="stylesheet" href="~/Content/css/site.css" />
     <link rel="stylesheet" href="~/Content/css/dashboard.css" />
     <link rel="stylesheet" href="~/Content/css/admin.css" />
+
+    @RenderSection("head", required: false)
 </head>
 <body class="bg-light">
 
-    <!-- Navbar -->
     <header class="bg-white border-bottom">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container">
-                <!-- Brand -->
-                <a class="navbar-brand fw-bold text-success fs-4" href="@Url.Action("Index","Home")">
-                    GreenCycle
-                </a>
+                <a class="navbar-brand fw-bold text-success fs-4" href="@Url.Action("Index","Home")">GreenCycle</a>
 
-                <!-- Toggle -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
                         aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Links -->
                 <div class="collapse navbar-collapse justify-content-end" id="mainNav">
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
 
                         @if (Request.IsAuthenticated)
                         {
-                            <!-- Drop-off Points -->
-                            <li class="nav-item">
-                                @Html.ActionLink("Drop-off Points", "Index", "DropOffPoints", null,
-                                    new { @class = "nav-link " + (isActive("DropOffPoints", "Index") ? "active" : "") })
-                            </li>
+                            @* NORMAL USER MENUS *@
+                            if (isPlainUser)
+                            {
+                                <li class="nav-item">
+                                    @Html.ActionLink("Drop-off Points", "Index", "DropOffPoints", null,
+                                        new { @class = "nav-link " + (isActive("DropOffPoints", "Index") ? "active" : "") })
+                                </li>
 
-                            <!-- Machines dropdown -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle @(isActive("Machines", "Nearby") || isActive("Machines", "How") ? "active" : "")"
-                                   href="#" id="machinesDropdown" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">
-                                    Machines
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="machinesDropdown">
-                                    <li>
-                                        @Html.ActionLink("Nearby", "Nearby", "Machines", null,
-                                            new { @class = "dropdown-item " + (isActive("Machines", "Nearby") ? "active" : "") })
-                                    </li>
-                                    <li>
-                                        @Html.ActionLink("How to Use", "How", "Machines", null,
-                                            new { @class = "dropdown-item " + (isActive("Machines", "How") ? "active" : "") })
-                                    </li>
-                                </ul>
-                            </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @(isMachinesActive ? "active" : "")"
+                                       href="#" id="machinesDropdown" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                        Machines
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="machinesDropdown">
+                                        <li>
+                                            @Html.ActionLink("Nearby", "Nearby", "Machines", null,
+                                                new { @class = "dropdown-item " + (isActive("Machines", "Nearby") ? "active" : "") })
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("How to Use", "How", "Machines", null,
+                                                new { @class = "dropdown-item " + (isActive("Machines", "How") ? "active" : "") })
+                                        </li>
+                                    </ul>
+                                </li>
 
-                            <!-- Wallet -->
-                            <li class="nav-item">
-                                @Html.ActionLink("Wallet", "Index", "Wallet", null,
-                                    new { @class = "nav-link " + (isActive("Wallet", "Index") ? "active" : "") })
-                            </li>
+                                <li class="nav-item">
+                                    @Html.ActionLink("Wallet", "Index", "Wallet", null,
+                                        new { @class = "nav-link " + (isActive("Wallet", "Index") ? "active" : "") })
+                                </li>
 
-                            <!-- Rewards -->
-                            <li class="nav-item">
-                                @Html.ActionLink("Rewards", "Index", "Rewards", null,
-                                    new { @class = "nav-link " + (isActive("Rewards", "Index") ? "active" : "") })
-                            </li>
+                                <li class="nav-item">
+                                    @Html.ActionLink("Rewards", "Index", "Rewards", null,
+                                        new { @class = "nav-link " + (isActive("Rewards", "Index") ? "active" : "") })
+                                </li>
 
-                            <!-- Support (Raise Issue) -->
-                            <li class="nav-item">
-                                @Html.ActionLink("Support", "Raise", "Issues", null,
-                                    new { @class = "nav-link " + (isActive("Issues", "Raise") ? "active" : "") })
-                            </li>
+                                <li class="nav-item">
+                                    @Html.ActionLink("Support", "Raise", "Issues", null,
+                                        new { @class = "nav-link " + (isActive("Issues", "Raise") ? "active" : "") })
+                                </li>
 
-                            <!-- Recognition (demo) -->
-                            <li class="nav-item">
-                                @Html.ActionLink("Recognition", "Result", "Recognition", null,
-                                    new { @class = "nav-link " + (isActive("Recognition", "Result") ? "active" : "") })
-                            </li>
+                                <li class="nav-item">
+                                    @Html.ActionLink("Recognition", "Result", "Recognition", null,
+                                        new { @class = "nav-link " + (isActive("Recognition", "Result") ? "active" : "") })
+                                </li>
+                            }
+
+                            @* COLLECTOR MENUS *@
+                            if (isCollector)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @(collectorActive ? "active" : "")"
+                                       href="#" id="collectorDropdown" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                        Collector
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="collectorDropdown">
+                                        <li>
+                                            @Html.ActionLink("Upcoming Feature", "Index", "CollectorFeature", null,
+                                                new { @class = "dropdown-item " + (isActive("CollectorFeature", "Index") ? "active" : "") })
+                                        </li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                        <li class="dropdown-header">Manage Drop-off</li>
+                                        <li>
+                                            @Html.ActionLink("Create", "Create", "DropOffPoints", null,
+                                                new { @class = "dropdown-item " + (isActive("DropOffPoints", "Create") ? "active" : "") })
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Edit", "Edit", "DropOffPoints", null,
+                                                new { @class = "dropdown-item " + (isActive("DropOffPoints", "Edit") ? "active" : "") })
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Delete", "Delete", "DropOffPoints", null,
+                                                new { @class = "dropdown-item " + (isActive("DropOffPoints", "Delete") ? "active" : "") })
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+
+                            @* ADMIN MENUS *@
+                            if (isAdmin)
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle @(adminActive ? "active" : "")"
+                                       href="#" id="adminDropdown" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                        Admin
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li>
+                                            @Html.ActionLink("Dashboard", "Index", "Dashboard",
+                                                new { area = "Admin" },
+                                                new { @class = "dropdown-item " + (isActiveArea("Admin", "Dashboard", "Index") ? "active" : "") })
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Users & Roles", "Index", "Users",
+                                                new { area = "Admin" },
+                                                new { @class = "dropdown-item " + (isActiveArea("Admin", "Users", "Index") ? "active" : "") })
+                                        </li>
+                                        <li>
+                                            @Html.ActionLink("Reports", "Index", "Reports",
+                                                new { area = "Admin" },
+                                                new { @class = "dropdown-item " + (isActiveArea("Admin", "Reports", "Index") ? "active" : "") })
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
                         }
 
                         <!-- Always visible -->
@@ -120,8 +189,16 @@
 
                         @if (Request.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <span class="nav-link">Hello, @User.Identity.Name</span>
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="nav-link">
+                                    Hello, @User.Identity.Name
+                                    @if (!string.IsNullOrEmpty(roleLabel))
+                                    {
+                                        <span class="badge rounded-pill @(isAdmin ? "bg-danger" : (isCollector ? "bg-primary" : "bg-secondary")) ms-2">
+                                            @roleLabel
+                                        </span>
+                                    }
+                                </span>
                             </li>
                             <li class="nav-item">
                                 @Html.ActionLink("Manage Profile", "Manage", "Account", null,
@@ -150,12 +227,17 @@
         </nav>
     </header>
 
-    <!-- Main content -->
     <main class="container my-4">
+        @if (TempData["StatusMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["StatusMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
         @RenderBody()
     </main>
 
-    <!-- Footer -->
     <footer class="border-top bg-white">
         <div class="container py-4 text-center text-muted">
             <div>© @DateTime.Now.Year &nbsp; GreenCycle</div>
@@ -166,16 +248,11 @@
         </div>
     </footer>
 
-    <!-- jQuery + Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Leaflet (map) JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-o9N1j8REpPmtz3cR9RRMg4Jflk0FLaN44vJfCjtM2jU="
             crossorigin=""></script>
-
-    <!-- Custom scripts -->
     <script src="~/Scripts/app/validation.js"></script>
 
     @RenderSection("scripts", required: false)

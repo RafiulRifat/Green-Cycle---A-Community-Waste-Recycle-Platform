@@ -1,6 +1,7 @@
 ﻿using Green_Cycle.Models;
 using Green_Cycle.Models.Entities;
 using Green_Cycle.Models.ViewModels.DropOffPoints;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -9,23 +10,29 @@ using System.Web.Mvc;
 
 namespace Green_Cycle.Controllers
 {
-    [Authorize]  // ✅ add this
+    [Authorize]  // all actions require sign-in by default
     public class DropOffPointsController : Controller
     {
-        private readonly ApplicationDbContext _db = new ApplicationDbContext();
+        private readonly ApplicationDbContext _db = ApplicationDbContext.Create();
+
+        private static readonly List<string> DefaultMaterials = new List<string>
+        { "Plastic", "Paper", "Glass", "Metal", "Organic", "E-Waste" };
 
         // GET: /DropOffPoints
         // Search by name/address, filter by max distance (km), paging + page-size
         [HttpGet]
         public async Task<ActionResult> Index(string search, int? distance, int page = 1, int pageSize = 10)
         {
-            if (page < 1) page = 1;
-            if (pageSize <= 0) pageSize = 10;
+            page = Math.Max(page, 1);
+            pageSize = pageSize <= 0 ? 10 : Math.Min(pageSize, 100);
 
             var q = _db.DropOffPoints.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
-                q = q.Where(p => p.Name.Contains(search) || p.Address.Contains(search));
+            {
+                var s = search.Trim();
+                q = q.Where(p => p.Name.Contains(s) || p.Address.Contains(s));
+            }
 
             if (distance.HasValue)
                 q = q.Where(p => p.DistanceKm <= distance.Value);
@@ -45,7 +52,7 @@ namespace Green_Cycle.Controllers
                 TotalCount = total
             };
 
-            return View(vm); // View: Views/DropOffPoints/Index.cshtml (typed to DropOffPointsIndexViewModel)
+            return View(vm); // Views/DropOffPoints/Index.cshtml
         }
 
         // GET: /DropOffPoints/Details/5
@@ -54,49 +61,52 @@ namespace Green_Cycle.Controllers
         {
             var point = await _db.DropOffPoints.FindAsync(id);
             if (point == null) return HttpNotFound();
-            return View(point); // View: Views/DropOffPoints/Details.cshtml (typed to DropOffPoint)
+            return View(point); // Views/DropOffPoints/Details.cshtml (model: DropOffPoint)
         }
 
         // GET: /DropOffPoints/Create
-        [Authorize, HttpGet]
+        [Authorize(Roles = "Collector,Admin"), HttpGet]
         public ActionResult Create()
         {
-            return View(new CreateDropOffPointViewModel()); // View: Views/DropOffPoints/Create.cshtml
+            return View(new CreateDropOffPointViewModel
+            {
+                AvailableMaterials = DefaultMaterials
+            }); // Views/DropOffPoints/Create.cshtml
         }
 
         // POST: /DropOffPoints/Create
-        [Authorize, HttpPost, ValidateAntiForgeryToken]
+        [Authorize(Roles = "Collector,Admin"), HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(
             [Bind(Include = "Name,Address,Latitude,Longitude,SelectedMaterials")]
             CreateDropOffPointViewModel vm)
         {
             if (!ModelState.IsValid)
             {
-                // Rehydrate chips list so the view renders properly after validation errors
-                if (vm.AvailableMaterials == null || vm.AvailableMaterials.Count == 0)
-                {
-                    vm.AvailableMaterials = new List<string>
-                    { "Plastic", "Paper", "Glass", "Metal", "Organic", "E-Waste" };
-                }
+                // Rehydrate options so the view re-renders correctly
+                vm.AvailableMaterials = vm.AvailableMaterials?.Count > 0 ? vm.AvailableMaterials : DefaultMaterials;
                 return View(vm);
             }
 
             var entity = new DropOffPoint
             {
-                Name = vm.Name,
-                Address = vm.Address,
+                Name = vm.Name?.Trim(),
+                Address = vm.Address?.Trim(),
                 Latitude = vm.Latitude,
                 Longitude = vm.Longitude,
                 MaterialsAccepted = string.Join(",", vm.SelectedMaterials ?? Enumerable.Empty<string>())
-                // DistanceKm: compute elsewhere if you need it
+                // DistanceKm can be computed elsewhere (e.g., background job or when listing)
             };
 
             _db.DropOffPoints.Add(entity);
             await _db.SaveChangesAsync();
 
-            // Show green success banner on the same page
+            // Show green success banner on the same page, ready for another entry
             ModelState.Clear();
-            return View(new CreateDropOffPointViewModel { Created = true });
+            return View(new CreateDropOffPointViewModel
+            {
+                Created = true,
+                AvailableMaterials = DefaultMaterials
+            });
         }
 
         protected override void Dispose(bool disposing)

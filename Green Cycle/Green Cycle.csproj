@@ -158,7 +158,9 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\IdentityConfig.cs" />
+    <Compile Include="App_Start\IdentitySeed.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\CollectorFeatureController.cs" />
     <Compile Include="Controllers\DropOffPointsController.cs" />
     <Compile Include="Controllers\IssuesController.cs" />
     <Compile Include="Controllers\MachinesController.cs" />
@@ -197,6 +199,14 @@
     <Compile Include="Migrations\202509051343479_ExtendDropOffPoint_GeoAndMaterials.Designer.cs">
       <DependentUpon>202509051343479_ExtendDropOffPoint_GeoAndMaterials.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202509130524421_UseDateTime2Everywhere.cs" />
+    <Compile Include="Migrations\202509130524421_UseDateTime2Everywhere.Designer.cs">
+      <DependentUpon>202509130524421_UseDateTime2Everywhere.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509130539319_UseDateTime2Everywhere1.cs" />
+    <Compile Include="Migrations\202509130539319_UseDateTime2Everywhere1.Designer.cs">
+      <DependentUpon>202509130539319_UseDateTime2Everywhere1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Entities\DropOffPoint.cs" />
     <Compile Include="Models\Entities\Hybrid\Machine.cs" />
@@ -205,6 +215,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ViewModels\Account\ChangePasswordViewModel.cs" />
     <Compile Include="Models\ViewModels\Account\ManageProfileViewModel.cs" />
+    <Compile Include="Models\ViewModels\Collector\RouteVm.cs" />
     <Compile Include="Models\ViewModels\DropOffPoints\CreateDropOffPointViewModel.cs" />
     <Compile Include="Models\ViewModels\DropOffPoints\DropOffPointsIndexViewModel.cs" />
     <Compile Include="Models\ViewModels\Home\HomeIndexViewModel.cs" />
@@ -298,11 +309,11 @@
     <Content Include="Areas\Admin\Views\Shared\_AdminNav.cshtml" />
     <Content Include="Areas\Admin\Views\Shared\Error.cshtml" />
     <Content Include="Areas\Admin\Views\Dashboard\Index.cshtml" />
-    <Content Include="Areas\Admin\Admin.Web.config" />
     <Content Include="Areas\Admin\Views\Events\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Posts\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Reports\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Users\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Web.config" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
@@ -358,9 +369,11 @@
     <Content Include="Views\Issues\Raise.cshtml" />
     <Content Include="Views\Rewards\Index.cshtml" />
     <Content Include="Views\Wallet\Index.cshtml" />
+    <Content Include="Views\CollectorFeature\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Areas\Admin\NewFolder1\" />
     <Folder Include="Content\images\icons\" />
     <Folder Include="Infrastructure\Helpers\" />
   </ItemGroup>
@@ -412,6 +425,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202509051343479_ExtendDropOffPoint_GeoAndMaterials.resx">
       <DependentUpon>202509051343479_ExtendDropOffPoint_GeoAndMaterials.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509130524421_UseDateTime2Everywhere.resx">
+      <DependentUpon>202509130524421_UseDateTime2Everywhere.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509130539319_UseDateTime2Everywhere1.resx">
+      <DependentUpon>202509130539319_UseDateTime2Everywhere1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
