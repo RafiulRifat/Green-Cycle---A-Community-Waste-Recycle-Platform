@@ -1,0 +1,90 @@
+﻿@model Green_Cycle.Models.Entities.CollectorRoute
+@{
+    ViewBag.Title = "Route Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <!-- Back link -->
+    <div class="mb-3">
+        <a href="@Url.Action("MyRoutes", "Collector")" class="btn btn-link">← Back to My Routes</a>
+    </div>
+
+    <!-- Header -->
+    <h2>Route Details – @Model.ZoneName</h2>
+    <p class="text-muted">
+        @Model.TotalStops stops · Starts @Model.StartTime.ToShortTimeString()
+        @if (Model.EstimatedFinish.HasValue)
+        {
+            @: · Finish by @Model.EstimatedFinish.Value.ToShortTimeString()
+        }
+    </p>
+
+    <!-- Summary -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Route Summary</h5>
+            <p>@Model.CompletedStops of @Model.TotalStops completed</p>
+
+            <div class="progress mb-3" style="max-width:300px;">
+                @{
+                    var pct = Model.TotalStops > 0
+                        ? (int)(100.0 * Model.CompletedStops / Model.TotalStops)
+                        : 0;
+                }
+                <div class="progress-bar" role="progressbar"
+                     style="width:@pct%" aria-valuenow="@pct"
+                     aria-valuemin="0" aria-valuemax="100">
+                    @pct%
+                </div>
+            </div>
+
+            <!-- Status -->
+            @if (Model.Status == "NotStarted")
+            {
+                <span class="badge bg-secondary">Not Started</span>
+            }
+            else if (Model.Status == "InProgress")
+            {
+                <span class="badge bg-info">In Progress</span>
+            }
+            else if (Model.Status == "Completed")
+            {
+                <span class="badge bg-success">Completed</span>
+            }
+        </div>
+    </div>
+
+    <!-- Stops list placeholder -->
+    <h4>Stops List</h4>
+    <p class="text-muted">
+        (Stops will show here once you add <code>RouteStop</code> entities
+        and include them in the model.)
+    </p>
+
+    <!-- Actions -->
+    <div class="mt-3">
+        @if (Model.Status == "NotStarted")
+        {
+            using (Html.BeginForm("StartRoute", "Collector", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("id", Model.Id)
+                <button type="submit" class="btn btn-outline-primary">Start Route</button>
+            }
+        }
+        else if (Model.Status == "InProgress")
+        {
+            using (Html.BeginForm("CompleteRoute", "Collector", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.Hidden("id", Model.Id)
+                <button type="submit" class="btn btn-success">Complete Route</button>
+            }
+        }
+        else
+        {
+            <span class="badge bg-success">This route is completed</span>
+        }
+    </div>
+</div>

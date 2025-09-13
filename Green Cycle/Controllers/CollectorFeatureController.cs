@@ -7,8 +7,8 @@ namespace Green_Cycle.Controllers
     {
         public ActionResult Index()
         {
-            // TODO: replace placeholder with your upcoming UI
-            return View();
+            // Redirect the old placeholder to the real dashboard
+            return RedirectToAction("MyRoutes", "Collector");
         }
     }
 }

@@ -10,7 +10,7 @@ using Newtonsoft.Json;                           // for DownloadData
 
 using System;
 using System.Linq;
-using System.Security.Claims;                    // <-- for ClaimTypes.Email
+using System.Security.Claims;                    // ClaimTypes.Email
 using System.Text;                               // for DownloadData bytes
 using System.Threading.Tasks;
 using System.Web;
@@ -53,7 +53,18 @@ namespace Green_Cycle.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
+                    {
+                        // Role-based post-login redirect
+                        var user = await UserManager.FindByEmailAsync(model.Email);
+                        if (user != null)
+                        {
+                            if (await UserManager.IsInRoleAsync(user.Id, "Admin"))
+                                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                            if (await UserManager.IsInRoleAsync(user.Id, "Collector"))
+                                return RedirectToAction("MyRoutes", "Collector");
+                        }
+                        return RedirectToLocal(returnUrl);
+                    }
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:
@@ -77,7 +88,7 @@ namespace Green_Cycle.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
-                FullName = (model as dynamic)?.FullName, // optional in your VM
+                FullName = (model as dynamic)?.FullName, // optional
                 JoinedOn = DateTime.UtcNow
             };
 
@@ -112,9 +123,21 @@ namespace Green_Cycle.Controllers
             var info = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (info == null) return RedirectToAction("Login");
 
-            // If already linked, try sign-in
+            // If already linked, try sign-in first
             var signIn = await SignInManager.ExternalSignInAsync(info, isPersistent: false);
-            if (signIn == SignInStatus.Success) return RedirectToLocal(returnUrl);
+            if (signIn == SignInStatus.Success)
+            {
+                // ✅ MVC5 / Identity 2: use FindAsync(info.Login), not FindByLoginAsync
+                var linkedUser = await UserManager.FindAsync(info.Login);
+                if (linkedUser != null)
+                {
+                    if (await UserManager.IsInRoleAsync(linkedUser.Id, "Admin"))
+                        return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                    if (await UserManager.IsInRoleAsync(linkedUser.Id, "Collector"))
+                        return RedirectToAction("MyRoutes", "Collector");
+                }
+                return RedirectToLocal(returnUrl);
+            }
             if (signIn == SignInStatus.LockedOut) return View("Lockout");
 
             // Create/link a local user if needed
@@ -140,8 +163,7 @@ namespace Green_Cycle.Controllers
                     Email = email,
                     FullName = info.ExternalIdentity?.Name,
                     JoinedOn = DateTime.UtcNow,
-                    // Choose your policy: often safe if provider verified the address
-                    EmailConfirmed = true
+                    EmailConfirmed = true // often acceptable for external providers
                 };
 
                 var create = await UserManager.CreateAsync(user);
@@ -155,10 +177,18 @@ namespace Green_Cycle.Controllers
                 await UserManager.AddToRoleAsync(user.Id, "User");
             }
 
+            // Link this external login to the local account, then sign in
             var link = await UserManager.AddLoginAsync(user.Id, info.Login);
             if (link.Succeeded)
             {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+
+                // Role-based redirect
+                if (await UserManager.IsInRoleAsync(user.Id, "Admin"))
+                    return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                if (await UserManager.IsInRoleAsync(user.Id, "Collector"))
+                    return RedirectToAction("MyRoutes", "Collector");
+
                 return RedirectToLocal(returnUrl);
             }
 
@@ -302,8 +332,10 @@ namespace Green_Cycle.Controllers
         {
             public ChallengeResult(string provider, string redirectUri)
             { LoginProvider = provider; RedirectUri = redirectUri; }
+
             public string LoginProvider { get; }
             public string RedirectUri { get; }
+
             public override void ExecuteResult(ControllerContext context)
             {
                 var properties = new AuthenticationProperties { RedirectUri = RedirectUri };

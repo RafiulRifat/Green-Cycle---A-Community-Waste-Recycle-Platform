@@ -160,6 +160,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\IdentitySeed.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\CollectorController.cs" />
     <Compile Include="Controllers\CollectorFeatureController.cs" />
     <Compile Include="Controllers\DropOffPointsController.cs" />
     <Compile Include="Controllers\IssuesController.cs" />
@@ -207,14 +208,38 @@
     <Compile Include="Migrations\202509130539319_UseDateTime2Everywhere1.Designer.cs">
       <DependentUpon>202509130539319_UseDateTime2Everywhere1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202509131332373_AddCollectorRoute.cs" />
+    <Compile Include="Migrations\202509131332373_AddCollectorRoute.Designer.cs">
+      <DependentUpon>202509131332373_AddCollectorRoute.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509131405299_AddCollectorRoute1.cs" />
+    <Compile Include="Migrations\202509131405299_AddCollectorRoute1.Designer.cs">
+      <DependentUpon>202509131405299_AddCollectorRoute1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509131454308_AddRouteStops.cs" />
+    <Compile Include="Migrations\202509131454308_AddRouteStops.Designer.cs">
+      <DependentUpon>202509131454308_AddRouteStops.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509131532546_AddRouteStops1.cs" />
+    <Compile Include="Migrations\202509131532546_AddRouteStops1.Designer.cs">
+      <DependentUpon>202509131532546_AddRouteStops1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509131605392_AddCollectorRoutes.cs" />
+    <Compile Include="Migrations\202509131605392_AddCollectorRoutes.Designer.cs">
+      <DependentUpon>202509131605392_AddCollectorRoutes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Entities\CollectorRoute.cs" />
     <Compile Include="Models\Entities\DropOffPoint.cs" />
     <Compile Include="Models\Entities\Hybrid\Machine.cs" />
     <Compile Include="Models\Entities\Hybrid\Material.cs" />
     <Compile Include="Models\Entities\Hybrid\ServiceZone.cs" />
+    <Compile Include="Models\Entities\RouteStop.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ViewModels\Account\ChangePasswordViewModel.cs" />
     <Compile Include="Models\ViewModels\Account\ManageProfileViewModel.cs" />
+    <Compile Include="Models\ViewModels\Collector\CollectorRoutesVm.cs" />
+    <Compile Include="Models\ViewModels\Collector\RouteDetailsVm.cs" />
     <Compile Include="Models\ViewModels\Collector\RouteVm.cs" />
     <Compile Include="Models\ViewModels\DropOffPoints\CreateDropOffPointViewModel.cs" />
     <Compile Include="Models\ViewModels\DropOffPoints\DropOffPointsIndexViewModel.cs" />
@@ -370,6 +395,8 @@
     <Content Include="Views\Rewards\Index.cshtml" />
     <Content Include="Views\Wallet\Index.cshtml" />
     <Content Include="Views\CollectorFeature\Index.cshtml" />
+    <Content Include="Views\Collector\MyRoutes.cshtml" />
+    <Content Include="Views\Collector\RouteDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -431,6 +458,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202509130539319_UseDateTime2Everywhere1.resx">
       <DependentUpon>202509130539319_UseDateTime2Everywhere1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509131332373_AddCollectorRoute.resx">
+      <DependentUpon>202509131332373_AddCollectorRoute.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509131405299_AddCollectorRoute1.resx">
+      <DependentUpon>202509131405299_AddCollectorRoute1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509131454308_AddRouteStops.resx">
+      <DependentUpon>202509131454308_AddRouteStops.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509131532546_AddRouteStops1.resx">
+      <DependentUpon>202509131532546_AddRouteStops1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509131605392_AddCollectorRoutes.resx">
+      <DependentUpon>202509131605392_AddCollectorRoutes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

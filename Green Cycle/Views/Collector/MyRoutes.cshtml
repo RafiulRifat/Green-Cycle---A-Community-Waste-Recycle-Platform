@@ -1,0 +1,161 @@
+@model Green_Cycle.Models.ViewModels.CollectorRoutesVm
+@{
+    ViewBag.Title = "My Routes (Today)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // state from controller
+    string status = (ViewBag.Status as string) ?? "All";
+    string q = (ViewBag.Q as string) ?? "";
+
+    int countAll = ViewBag.CountAll ?? 0;
+    int countNotStarted = ViewBag.CountNotStarted ?? 0;
+    int countInProgress = ViewBag.CountInProgress ?? 0;
+    int countCompleted = ViewBag.CountCompleted ?? 0;
+
+    Func<string, string> tabClass = s => s == status
+        ? "btn btn-secondary btn-sm active"
+        : "btn btn-outline-secondary btn-sm";
+}
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+        <div class="mb-2">
+            <h2 class="mb-0">My Routes (Today)</h2>
+            <small class="text-muted">See all pickup routes assigned for today</small>
+        </div>
+        <div class="text-muted">@DateTime.Now.ToString("MMM dd — h:mm tt")</div>
+    </div>
+
+    <!-- Filters + Search -->
+    <div class="d-flex gap-2 mb-4 align-items-center flex-wrap">
+        <div class="btn-group" role="group" aria-label="Route status filters">
+            <a class="@tabClass("All")"
+               href="@Url.Action("MyRoutes", new { status = "All",        q = q })">All (@countAll)</a>
+
+            <a class="@tabClass("NotStarted")"
+               href="@Url.Action("MyRoutes", new { status = "NotStarted", q = q })">Not Started (@countNotStarted)</a>
+
+            <a class="@tabClass("InProgress")"
+               href="@Url.Action("MyRoutes", new { status = "InProgress", q = q })">In Progress (@countInProgress)</a>
+
+            <a class="@tabClass("Completed")"
+               href="@Url.Action("MyRoutes", new { status = "Completed",  q = q })">Completed (@countCompleted)</a>
+        </div>
+
+        <form method="get" class="ms-auto d-flex" style="min-width:280px;">
+            <input type="hidden" name="status" value="@status" />
+            <input type="text" name="q" value="@q" class="form-control form-control-sm" placeholder="Search routes" />
+            <button class="btn btn-outline-secondary btn-sm ms-2" type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center">
+                <div class="fw-bold fs-5">@Model.TotalRoutes</div>
+                <small>Total Routes</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center">
+                <div class="fw-bold fs-5">@Model.TotalStops</div>
+                <small>Total Stops</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center">
+                <div class="fw-bold fs-5">@Model.RemainingStops</div>
+                <small>Remaining</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center">
+                <div class="fw-bold fs-5">@Model.TotalDistance.ToString("0.0") km</div>
+                <small>Distance</small>
+            </div>
+        </div>
+        @if (Model.FinishBy.HasValue)
+        {
+            <div class="col-12 col-md-3">
+                <div class="card p-3 text-center">
+                    <small>Finish by</small>
+                    <div class="fw-bold fs-5">@Model.FinishBy.Value.ToShortTimeString()</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- List -->
+    @if (!Model.Routes.Any())
+    {
+        <div class="alert alert-info text-center">
+            No routes assigned today<br />
+            <small>Check back later or contact your supervisor</small>
+        </div>
+    }
+    else
+    {
+        foreach (var r in Model.Routes)
+        {
+            var pct = r.TotalStops > 0 ? (int)(100.0 * r.CompletedStops / r.TotalStops) : 0;
+
+            <div class="card mb-3">
+                <div class="card-body d-flex flex-wrap justify-content-between align-items-center">
+                    <div class="me-3">
+                        <h5 class="mb-1">@r.ZoneName</h5>
+                        <p class="text-muted mb-2">
+                            @r.TotalStops stops • @r.StartTime.ToShortTimeString() • @r.Status
+                        </p>
+                        @if (r.Status == "InProgress")
+                        {
+                            <div class="progress" style="max-width:260px;">
+                                <div class="progress-bar bg-success"
+                                     role="progressbar"
+                                     style="width:@pct%"
+                                     aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100">
+                                    @r.CompletedStops of @r.TotalStops
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="text-end">
+                        @Html.ActionLink("View Route", "RouteDetails", "Collector",
+                                         new { id = r.Id },
+                                         new { @class = "btn btn-link btn-sm d-block mb-1" })
+
+                        @if (r.Status == "NotStarted")
+                        {
+                            using (Html.BeginForm("StartRoute", "Collector", FormMethod.Post, new { @class = "d-inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", r.Id)
+                                @Html.Hidden("status", status)
+                                @Html.Hidden("q", q)
+                                <button type="submit" class="btn btn-outline-primary">Start</button>
+                            }
+                        }
+                        else if (r.Status == "InProgress")
+                        {
+                            using (Html.BeginForm("CompleteRoute", "Collector", FormMethod.Post, new { @class = "d-inline" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("id", r.Id)
+                                @Html.Hidden("status", status)
+                                @Html.Hidden("q", q)
+                                <button type="submit" class="btn btn-success">Complete</button>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Completed</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
