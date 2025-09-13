@@ -1,12 +1,17 @@
-﻿using Green_Cycle.Models;
-using Green_Cycle.Models.ViewModels.Account;
+﻿using Green_Cycle.Models;                        // ApplicationUser, ApplicationDbContext
+using Green_Cycle.Models.ViewModels.Account;     // ViewModels
+
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNet.Identity.EntityFramework; // RoleManager<IdentityRole>, RoleStore
+using Microsoft.AspNet.Identity.Owin;            // SignInManager, GetUserManager<T>
 using Microsoft.Owin.Security;
-using Newtonsoft.Json;            // <— for DownloadData
+
+using Newtonsoft.Json;                           // for DownloadData
+
 using System;
-using System.Net;
-using System.Text;                // <— for DownloadData bytes
+using System.Linq;
+using System.Security.Claims;                    // <-- for ClaimTypes.Email
+using System.Text;                               // for DownloadData bytes
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -20,15 +25,22 @@ namespace Green_Cycle.Controllers
 
         public ApplicationUserManager UserManager
             => _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+
         public ApplicationSignInManager SignInManager
             => _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-        private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
+
+        private IAuthenticationManager AuthenticationManager
+            => HttpContext.GetOwinContext().Authentication;
 
         // -------------------------
         // Auth: Login / Register
         // -------------------------
         [AllowAnonymous, HttpGet]
-        public ActionResult Login(string returnUrl) { ViewBag.ReturnUrl = returnUrl; return View(); }
+        public ActionResult Login(string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return View();
+        }
 
         [AllowAnonymous, HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
@@ -36,13 +48,21 @@ namespace Green_Cycle.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var result = await SignInManager.PasswordSignInAsync(
-                model.Email, model.Password, model.RememberMe, shouldLockout: false);
+                model.Email, model.Password, model.RememberMe, shouldLockout: true);
 
-            if (result == SignInStatus.Success) return RedirectToLocal(returnUrl);
-            if (result == SignInStatus.LockedOut) return View("Lockout");
-
-            ModelState.AddModelError("", "Invalid login attempt.");
-            return View(model);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    return RedirectToLocal(returnUrl);
+                case SignInStatus.LockedOut:
+                    return View("Lockout");
+                case SignInStatus.RequiresVerification:
+                    ModelState.AddModelError("", "Two-factor verification required.");
+                    return View(model);
+                default:
+                    ModelState.AddModelError("", "Invalid login attempt.");
+                    return View(model);
+            }
         }
 
         [AllowAnonymous, HttpGet]
@@ -57,17 +77,20 @@ namespace Green_Cycle.Controllers
             {
                 UserName = model.Email,
                 Email = model.Email,
-                // if your RegisterViewModel has FullName, use it; otherwise this will be null
-                FullName = (model as dynamic)?.FullName,
+                FullName = (model as dynamic)?.FullName, // optional in your VM
                 JoinedOn = DateTime.UtcNow
             };
 
             var result = await UserManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
+                await EnsureRoleExists("User");
+                await UserManager.AddToRoleAsync(user.Id, "User");
+
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 return RedirectToAction("Index", "Home");
             }
+
             foreach (var e in result.Errors) ModelState.AddModelError("", e);
             return View(model);
         }
@@ -89,25 +112,57 @@ namespace Green_Cycle.Controllers
             var info = await AuthenticationManager.GetExternalLoginInfoAsync();
             if (info == null) return RedirectToAction("Login");
 
-            var result = await SignInManager.ExternalSignInAsync(info, isPersistent: false);
-            if (result == SignInStatus.Success) return RedirectToLocal(returnUrl);
+            // If already linked, try sign-in
+            var signIn = await SignInManager.ExternalSignInAsync(info, isPersistent: false);
+            if (signIn == SignInStatus.Success) return RedirectToLocal(returnUrl);
+            if (signIn == SignInStatus.LockedOut) return View("Lockout");
 
-            var user = new ApplicationUser
-            {
-                UserName = info.Email,
-                Email = info.Email,
-                FullName = info.ExternalIdentity?.Name,
-                JoinedOn = DateTime.UtcNow
-            };
+            // Create/link a local user if needed
+            // Prefer provider-supplied email; fall back to common claim types
+            var email =
+                info.Email
+                ?? info.ExternalIdentity?.FindFirstValue(ClaimTypes.Email)
+                ?? info.ExternalIdentity?.FindFirstValue("email")
+                ?? info.ExternalIdentity?.FindFirstValue("preferred_username");
 
-            var create = await UserManager.CreateAsync(user);
-            if (create.Succeeded)
+            if (string.IsNullOrWhiteSpace(email))
             {
-                await UserManager.AddLoginAsync(user.Id, info.Login);
+                ModelState.AddModelError("", "Your external provider did not return an email address.");
+                return RedirectToAction("Login");
+            }
+
+            var user = await UserManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = info.ExternalIdentity?.Name,
+                    JoinedOn = DateTime.UtcNow,
+                    // Choose your policy: often safe if provider verified the address
+                    EmailConfirmed = true
+                };
+
+                var create = await UserManager.CreateAsync(user);
+                if (!create.Succeeded)
+                {
+                    foreach (var e in create.Errors) ModelState.AddModelError("", e);
+                    return RedirectToAction("Login");
+                }
+
+                await EnsureRoleExists("User");
+                await UserManager.AddToRoleAsync(user.Id, "User");
+            }
+
+            var link = await UserManager.AddLoginAsync(user.Id, info.Login);
+            if (link.Succeeded)
+            {
                 await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 return RedirectToLocal(returnUrl);
             }
-            foreach (var e in create.Errors) ModelState.AddModelError("", e);
+
+            foreach (var e in link.Errors) ModelState.AddModelError("", e);
             return RedirectToAction("Login");
         }
 
@@ -118,7 +173,7 @@ namespace Green_Cycle.Controllers
         public async Task<ActionResult> Manage()
         {
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            if (user == null) return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+            if (user == null) return new HttpStatusCodeResult(404);
 
             var vm = new ManageProfileViewModel
             {
@@ -137,18 +192,16 @@ namespace Green_Cycle.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            if (user == null) return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+            if (user == null) return new HttpStatusCodeResult(404);
 
-            // Update name
             user.FullName = model.FullName;
 
-            // Toggle 2FA if changed
             if (user.TwoFactorEnabled != model.TwoFactorEnabled)
             {
-                var tfaResult = await UserManager.SetTwoFactorEnabledAsync(user.Id, model.TwoFactorEnabled);
-                if (!tfaResult.Succeeded)
+                var tfa = await UserManager.SetTwoFactorEnabledAsync(user.Id, model.TwoFactorEnabled);
+                if (!tfa.Succeeded)
                 {
-                    foreach (var e in tfaResult.Errors) ModelState.AddModelError("", e);
+                    foreach (var e in tfa.Errors) ModelState.AddModelError("", e);
                     return View(model);
                 }
             }
@@ -197,7 +250,7 @@ namespace Green_Cycle.Controllers
         public async Task<ActionResult> DownloadData()
         {
             var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            if (user == null) return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+            if (user == null) return new HttpStatusCodeResult(404);
 
             var payload = new
             {
@@ -210,7 +263,6 @@ namespace Green_Cycle.Controllers
                     user.JoinedOn,
                     user.TwoFactorEnabled
                 }
-                // Add more related entities here if needed
             };
 
             var json = JsonConvert.SerializeObject(payload, Formatting.Indented);
@@ -225,6 +277,26 @@ namespace Green_Cycle.Controllers
             => !string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)
                ? (ActionResult)Redirect(returnUrl)
                : RedirectToAction("Index", "Home");
+
+        // Ensure a role exists before assigning
+        private async Task EnsureRoleExists(string roleName)
+        {
+            var roleManager = HttpContext.GetOwinContext().GetUserManager<RoleManager<IdentityRole>>();
+            if (roleManager != null)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                return;
+            }
+
+            // Fallback if RoleManager wasn’t registered in OWIN
+            using (var ctx = ApplicationDbContext.Create())
+            {
+                var rm = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(ctx));
+                if (!await rm.RoleExistsAsync(roleName))
+                    await rm.CreateAsync(new IdentityRole(roleName));
+            }
+        }
 
         private class ChallengeResult : HttpUnauthorizedResult
         {

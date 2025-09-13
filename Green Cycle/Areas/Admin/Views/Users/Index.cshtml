@@ -1,0 +1,88 @@
+@using System.Linq
+@using System.Collections.Generic
+@model Green_Cycle.Areas.Admin.Controllers.UsersIndexVm
+
+@{
+    ViewBag.Title = "Users & Roles";
+    // Use the dedicated admin layout
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    var q = Model?.Query ?? "";
+    var selectedRole = Model?.Role ?? "";
+    var rows = Model?.Users ?? Enumerable.Empty<Green_Cycle.Areas.Admin.Controllers.UsersListItemVm>();
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Users & Roles</h2>
+        @* <a class="btn btn-primary">Add User</a> *@
+    </div>
+
+    @if (TempData["ok"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["ok"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-sm-5">
+            <input class="form-control" type="text" name="q" value="@q" placeholder="Search by name or email" />
+        </div>
+        <div class="col-sm-3">
+            <select name="role" class="form-select">
+                <option value="">All roles</option>
+                <option value="Admin" @(selectedRole == "Admin" ? "selected" : "")>Admin</option>
+                <option value="Collector" @(selectedRole == "Collector" ? "selected" : "")>Collector</option>
+                <option value="User" @(selectedRole == "User" ? "selected" : "")>User</option>
+            </select>
+        </div>
+        <div class="col-sm-auto">
+            <button class="btn btn-outline-primary">Filter</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th style="width:28%">Email</th>
+                    <th style="width:28%">Name</th>
+                    <th style="width:24%">Roles</th>
+                    <th style="width:20%"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in rows)
+                {
+                    var roles = string.Join(", ", (u.Roles ?? new List<string>()));
+                    bool isCollector = u.Roles != null && u.Roles.Contains("Collector");
+                    <tr>
+                        <td>@u.Email</td>
+                        <td>@u.FullName</td>
+                        <td>@roles</td>
+                        <td class="text-nowrap">
+                            @if (!isCollector)
+                            {
+                                using (Html.BeginForm("AddCollector", "Users", new { area = "Admin", id = u.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-primary btn-sm me-2">Add Collector</button>
+                                }
+                            }
+                            else
+                            {
+                                using (Html.BeginForm("RemoveCollector", "Users", new { area = "Admin", id = u.Id }, FormMethod.Post, new { @class = "d-inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Remove Collector</button>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
