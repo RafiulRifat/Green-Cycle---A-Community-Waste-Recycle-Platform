@@ -4,8 +4,8 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Data.Entity;                 // DbSet
-using Green_Cycle.Models.Entities;        // <-- for DropOffPoint
+using System.Data.Entity;                       // DbSet, DbContext
+using Green_Cycle.Models.Entities;              // DropOffPoint, CollectorRoute, RouteStop
 
 namespace Green_Cycle.Models
 {
@@ -13,15 +13,13 @@ namespace Green_Cycle.Models
     {
         public ApplicationUser()
         {
-            // ✅ Prevent SQL "datetime" out-of-range issues by never leaving MinValue
+            // Safe default for non-nullable DateTime
             JoinedOn = DateTime.UtcNow;
         }
 
-        // Name shown in Manage Profile
         [MaxLength(256)]
         public string FullName { get; set; }
 
-        // Date when the user joined (non-nullable; we set a safe default above)
         public DateTime JoinedOn { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
@@ -44,26 +42,21 @@ namespace Green_Cycle.Models
             return new ApplicationDbContext();
         }
 
-        // ✅ App tables
+        // ✅ Application tables
         public DbSet<DropOffPoint> DropOffPoints { get; set; }
+        public DbSet<CollectorRoute> CollectorRoutes { get; set; }
+        public DbSet<RouteStop> RouteStops { get; set; }
 
-        /// <summary>
-        /// Map all DateTime/DateTime? to datetime2 to avoid MinValue range problems.
-        /// </summary>
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Store DateTimes as datetime2 (supports full .NET range)
+            // Ensure all DateTimes use datetime2 in SQL (wider range)
             modelBuilder.Properties<DateTime>()
-                .Configure(c => c.HasColumnType("datetime2"));
-            modelBuilder.Properties<DateTime?>()
-                .Configure(c => c.HasColumnType("datetime2"));
+                        .Configure(c => c.HasColumnType("datetime2"));
 
-            // Optional: per-column configuration examples
-            // modelBuilder.Entity<ApplicationUser>()
-            //     .Property(u => u.JoinedOn)
-            //     .HasColumnType("datetime2");
+            modelBuilder.Properties<DateTime?>()
+                        .Configure(c => c.HasColumnType("datetime2"));
         }
     }
 }

@@ -18,15 +18,15 @@
     // Role flags
     bool isAdmin = User?.IsInRole("Admin") ?? false;
     bool isCollector = User?.IsInRole("Collector") ?? false;
-    bool isPlainUser = Request.IsAuthenticated && !isAdmin && !isCollector; // signed-in non-admin, non-collector
+    bool isPlainUser = Request.IsAuthenticated && !isAdmin && !isCollector;
     string roleLabel = isAdmin ? "Admin" : (isCollector ? "Collector" : (Request.IsAuthenticated ? "User" : null));
 
-    // ---- MOVE ALL INLINE SETUPS HERE (no @{ ... } inside ifs later) ----
+    // Precompute active flags
     bool isMachinesActive =
         isActive("Machines", "Nearby") || isActive("Machines", "How");
 
     bool collectorActive =
-        isActive("CollectorFeature", "Index") ||
+        isActive("Collector", "MyRoutes") ||
         isActive("DropOffPoints", "Create") ||
         isActive("DropOffPoints", "Edit") ||
         isActive("DropOffPoints", "Delete");
@@ -56,7 +56,6 @@
     @RenderSection("head", required: false)
 </head>
 <body class="bg-light">
-
     <header class="bg-white border-bottom">
         <nav class="navbar navbar-expand-lg navbar-light bg-white">
             <div class="container">
@@ -72,7 +71,9 @@
 
                         @if (Request.IsAuthenticated)
                         {
-                            @* NORMAL USER MENUS *@
+                            /* -----------------------
+                               Normal user menus only
+                               ----------------------- */
                             if (isPlainUser)
                             {
                                 <li class="nav-item">
@@ -119,7 +120,9 @@
                                 </li>
                             }
 
-                            @* COLLECTOR MENUS *@
+                            /* -----------------------
+                               Collector menus
+                               ----------------------- */
                             if (isCollector)
                             {
                                 <li class="nav-item dropdown">
@@ -130,8 +133,8 @@
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="collectorDropdown">
                                         <li>
-                                            @Html.ActionLink("Upcoming Feature", "Index", "CollectorFeature", null,
-                                                new { @class = "dropdown-item " + (isActive("CollectorFeature", "Index") ? "active" : "") })
+                                            @Html.ActionLink("My Routes (Today)", "MyRoutes", "Collector", null,
+                                                new { @class = "dropdown-item " + (isActive("Collector", "MyRoutes") ? "active" : "") })
                                         </li>
                                         <li><hr class="dropdown-divider" /></li>
                                         <li class="dropdown-header">Manage Drop-off</li>
@@ -151,7 +154,9 @@
                                 </li>
                             }
 
-                            @* ADMIN MENUS *@
+                            /* -----------------------
+                               Admin menus
+                               ----------------------- */
                             if (isAdmin)
                             {
                                 <li class="nav-item dropdown">
