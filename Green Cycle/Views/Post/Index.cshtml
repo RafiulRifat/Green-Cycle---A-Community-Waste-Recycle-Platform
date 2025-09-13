@@ -1,0 +1,47 @@
+@model GreenCycle.Models.ViewModels.Posts.PostListViewModel
+@{ ViewBag.Title = "Posts"; }
+
+<div class="container my-4">
+    <h2 class="mb-3">Posts</h2>
+
+    <!-- Search -->
+    <form method="get" action="@Url.Action("Index","Post")" class="mb-3">
+        <div class="position-relative">
+            <input name="search"
+                   value="@Model.Search"
+                   class="form-control ps-5"
+                   placeholder="Search" />
+            <!-- magnifier icon -->
+            <span class="position-absolute top-50 translate-middle-y ms-3 text-muted" style="pointer-events:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.868-3.833zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+            </span>
+        </div>
+    </form>
+
+    @if (Model.Posts == null || !Model.Posts.Any())
+    {
+        <div class="alert alert-light border">No published posts @(string.IsNullOrWhiteSpace(Model.Search) ? "" : $"for \"{Model.Search}\"").</div>
+    }
+    else
+    {
+        foreach (var post in Model.Posts)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h4 class="card-title">@post.Title</h4>
+                    <div class="text-muted mb-2">@post.PublishedAtUtc?.ToString("MMMM d, yyyy")</div>
+                    <p class="card-text">
+                        @(!string.IsNullOrWhiteSpace(post.Summary)
+                            ? post.Summary
+                            : (!string.IsNullOrEmpty(post.Body) && post.Body.Length > 140
+                                ? post.Body.Substring(0, 140) + "…"
+                                : post.Body))
+                    </p>
+                    <a class="text-success fw-semibold" href="@Url.Action("Details", "Post", new { id = post.Id })">Read More</a>
+                </div>
+            </div>
+        }
+    }
+</div>

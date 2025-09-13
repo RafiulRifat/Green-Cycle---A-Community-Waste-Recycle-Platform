@@ -47,6 +47,26 @@
                             @Html.ActionLink("Recognition", "Result", "Recognition", null,
                                 new { @class = "nav-link " + (isActive("Recognition", "Result") ? "active" : "") })
                         </li>
+
+                        <li class="nav-item">
+                            @Html.ActionLink("Challenges", "Index", "Challenge", null, new { @class = "nav-link" })
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="postsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Posts
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="postsDropdown">
+                                <li>
+                                    @Html.ActionLink("All Posts", "Index", "Post", null, new { @class = "dropdown-item" })
+                                </li>
+                                <li>
+                                    @Html.ActionLink("Create Post", "Create", "Post", null, new { @class = "dropdown-item" })
+                                </li>
+                            </ul>
+                        </li>
+
+
                         <li class="nav-item">
                             @Html.ActionLink("Privacy", "Privacy", "Home", null,
                                 new { @class = "nav-link " + (isActive("Home", "Privacy") ? "active" : "") })
@@ -79,6 +99,8 @@
                             </li>
                         }
                     </ul>
+
+
                 </div>
             </div>
         </nav>
