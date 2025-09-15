@@ -1,37 +1,126 @@
 ﻿@model GreenCycle.Models.ViewModels.RecognitionResultViewModel
-@using GreenCycle.Models.Entities
-
 @{
     ViewBag.Title = "Emission Result";
 }
 
-<h2>@ViewBag.Title</h2>
+<!-- Page-scoped styles -->
+<style>
+    .gcv-hero {
+        background: linear-gradient(135deg, #047857, #059669);
+        color: #fff;
+        padding: 26px 22px;
+        border-radius: 18px;
+        box-shadow: 0 12px 24px rgba(4,120,87,.25);
+        margin-bottom: 22px;
+    }
 
-<table class="table table-bordered table-striped">
-    <tr>
-        <th>Material</th>
-        <td>@Model.Material</td>
-    </tr>
-    <tr>
-        <th>Weight (kg)</th>
-        <td>@Model.WeightKg</td>
-    </tr>
-    <tr>
-        <th>Emission factor range (kg CO₂e / kg)</th>
-        <td>@Model.FactorMinKgPerKg – @Model.FactorMaxKgPerKg</td>
-    </tr>
-    <tr>
-        <th>Total emissions (min – max kg CO₂e)</th>
-        <td>@Model.EmissionsMinKg – @Model.EmissionsMaxKg</td>
-    </tr>
-    <tr>
-        <th>Total emissions (average kg CO₂e)</th>
-        <td><strong>@Model.EmissionsAvgKg</strong></td>
-    </tr>
-</table>
+        .gcv-hero h2 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: .3px
+        }
 
-<p class="text-muted">@Model.Notes</p>
+        .gcv-hero p {
+            margin: 6px 0 0;
+            opacity: .95
+        }
 
-<p>
-    @Html.ActionLink("Calculate another", "Index", "Recognition", null, new { @class = "btn btn-default" })
-</p>
+    .gcv-card {
+        background: #fff;
+        border: 1px solid #b7ead1;
+        border-radius: 18px;
+        box-shadow: 0 10px 18px rgba(0,0,0,.04);
+        padding: 20px
+    }
+
+    .table.gcv-table {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #b7ead1
+    }
+
+        .table.gcv-table > thead > tr > th {
+            background: #e6f9ef;
+            color: #073b2d;
+            border-color: #b7ead1;
+            font-weight: 700
+        }
+
+        .table.gcv-table > tbody > tr > th {
+            background: #e6f9ef;
+            color: #0c4a3a;
+            width: 40%;
+            border-color: #b7ead1
+        }
+
+        .table.gcv-table > tbody > tr > td {
+            border-color: #b7ead1
+        }
+
+    .gcv-btn {
+        background: #047857;
+        border: 1px solid #065f46;
+        color: #fff !important;
+        font-weight: 600;
+        padding: 10px 18px;
+        border-radius: 999px;
+        transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+        box-shadow: 0 8px 16px rgba(4,120,87,.25)
+    }
+
+        .gcv-btn:hover, .gcv-btn:focus {
+            background: #065f46;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(4,120,87,.3)
+        }
+
+    .gcv-note {
+        color: #0c4a3a;
+        opacity: .85
+    }
+</style>
+
+<div class="gcv-hero">
+    <h2>Emission Result</h2>
+    <p>Your estimated footprint for this material and weight.</p>
+</div>
+
+<div class="gcv-card">
+    <table class="table gcv-table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Material</th>
+                <td>@Model.Material</td>
+            </tr>
+            <tr>
+                <th>Weight (kg)</th>
+                <td>@Model.WeightKg</td>
+            </tr>
+            <tr>
+                <th>Emission factor range (kg CO₂e / kg)</th>
+                <td>@Model.FactorMinKgPerKg – @Model.FactorMaxKgPerKg</td>
+            </tr>
+            <tr>
+                <th>Total emissions (min – max kg CO₂e)</th>
+                <td>@Model.EmissionsMinKg – @Model.EmissionsMaxKg</td>
+            </tr>
+            <tr>
+                <th style="font-weight:800;">Total emissions (average kg CO₂e)</th>
+                <td><strong style="font-size:1.15em;">@Model.EmissionsAvgKg</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p class="gcv-note">@Model.Notes</p>
+
+    <div style="margin-top:14px;">
+        @Html.ActionLink("Calculate another", "Index", "Recognition", null, new { @class = "gcv-btn" })
+    </div>
+</div>
