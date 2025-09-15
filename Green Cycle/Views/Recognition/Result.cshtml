@@ -3,15 +3,14 @@
     ViewBag.Title = "Emission Result";
 }
 
-<!-- Page-scoped styles -->
 <style>
     .gcv-hero {
-        background: linear-gradient(135deg, #047857, #059669);
+        background: linear-gradient(135deg,#047857,#059669);
         color: #fff;
         padding: 26px 22px;
         border-radius: 18px;
         box-shadow: 0 12px 24px rgba(4,120,87,.25);
-        margin-bottom: 22px;
+        margin-bottom: 22px
     }
 
         .gcv-hero h2 {
@@ -65,7 +64,7 @@
         font-weight: 600;
         padding: 10px 18px;
         border-radius: 999px;
-        transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+        transition: transform .08s ease,box-shadow .2s ease,background .2s ease;
         box-shadow: 0 8px 16px rgba(4,120,87,.25)
     }
 
@@ -79,6 +78,14 @@
         color: #0c4a3a;
         opacity: .85
     }
+
+    .gcv-photo {
+        border-radius: 14px;
+        border: 1px solid #b7ead1;
+        box-shadow: 0 6px 14px rgba(0,0,0,.06);
+        max-width: 360px;
+        height: auto
+    }
 </style>
 
 <div class="gcv-hero">
@@ -89,38 +96,26 @@
 <div class="gcv-card">
     <table class="table gcv-table">
         <thead>
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-            </tr>
+            <tr><th>Field</th><th>Value</th></tr>
         </thead>
         <tbody>
-            <tr>
-                <th>Material</th>
-                <td>@Model.Material</td>
-            </tr>
-            <tr>
-                <th>Weight (kg)</th>
-                <td>@Model.WeightKg</td>
-            </tr>
-            <tr>
-                <th>Emission factor range (kg CO₂e / kg)</th>
-                <td>@Model.FactorMinKgPerKg – @Model.FactorMaxKgPerKg</td>
-            </tr>
-            <tr>
-                <th>Total emissions (min – max kg CO₂e)</th>
-                <td>@Model.EmissionsMinKg – @Model.EmissionsMaxKg</td>
-            </tr>
-            <tr>
-                <th style="font-weight:800;">Total emissions (average kg CO₂e)</th>
-                <td><strong style="font-size:1.15em;">@Model.EmissionsAvgKg</strong></td>
-            </tr>
+            <tr><th>Material</th><td>@Model.Material</td></tr>
+            <tr><th>Weight (kg)</th><td>@Model.WeightKg</td></tr>
+            <tr><th>Emission factor range (kg CO₂e / kg)</th><td>@Model.FactorMinKgPerKg – @Model.FactorMaxKgPerKg</td></tr>
+            <tr><th>Total emissions (min – max kg CO₂e)</th><td>@Model.EmissionsMinKg – @Model.EmissionsMaxKg</td></tr>
+            <tr><th style="font-weight:800;">Total emissions (average kg CO₂e)</th><td><strong style="font-size:1.15em;">@Model.EmissionsAvgKg</strong></td></tr>
         </tbody>
     </table>
 
-    <p class="gcv-note">@Model.Notes</p>
+    @if (!string.IsNullOrEmpty(Model.PhotoDataUrl))
+    {
+        <div style="margin-top:16px;">
+            <p class="gcv-note">Uploaded photo:</p>
+            <img src="@Model.PhotoDataUrl" alt="Uploaded photo" class="gcv-photo" />
+        </div>
+    }
 
-    <div style="margin-top:14px;">
+    <div style="margin-top:18px;">
         @Html.ActionLink("Calculate another", "Index", "Recognition", null, new { @class = "gcv-btn" })
     </div>
 </div>

@@ -15,5 +15,8 @@ namespace GreenCycle.Models.ViewModels
         public decimal EmissionsAvgKg { get; set; }
 
         public string Notes { get; set; }
+
+        // For previewing the uploaded photo on the result page (data URL)
+        public string PhotoDataUrl { get; set; }
     }
 }

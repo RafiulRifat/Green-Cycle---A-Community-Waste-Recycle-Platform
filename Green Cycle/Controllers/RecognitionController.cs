@@ -1,8 +1,11 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Web.Mvc;
 using GreenCycle.Models.Entities;          // for MaterialType
 using GreenCycle.Models.ViewModels;
 using GreenCycle.Services.Interfaces;
-using GreenCycle.Services.Implementations; // for default fallback
+using GreenCycle.Services.Implementations;
 
 namespace GreenCycle.Controllers
 {
@@ -10,16 +13,13 @@ namespace GreenCycle.Controllers
     {
         private readonly IRecognitionService _recognitionService;
 
-        // DI ctor
         public RecognitionController(IRecognitionService recognitionService)
         {
             _recognitionService = recognitionService;
         }
 
-        // Fallback ctor if you don't have a DI container
         public RecognitionController() : this(new RecognitionService()) { }
 
-        // GET /Recognition
         [HttpGet]
         public ActionResult Index()
         {
@@ -31,14 +31,51 @@ namespace GreenCycle.Controllers
             return View(vm);
         }
 
-        // POST /Recognition
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Index(RecognitionViewModel model)
         {
+            // Validate material/weight
             if (!ModelState.IsValid)
                 return View(model);
 
+            // Optional image validation
+            string photoDataUrl = null;
+            if (model.Photo != null && model.Photo.ContentLength > 0)
+            {
+                // 1) Content type / extension allowlist
+                var okTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
+                var okExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
+                var contentType = (model.Photo.ContentType ?? "").ToLowerInvariant();
+                var ext = Path.GetExtension(model.Photo.FileName ?? "").ToLowerInvariant();
+
+                if (!okTypes.Contains(contentType) || !okExts.Contains(ext))
+                {
+                    ModelState.AddModelError("Photo", "Please upload a JPG, PNG, GIF, or WEBP image.");
+                    return View(model);
+                }
+
+                // 2) Size limit (e.g., 5 MB)
+                const int maxBytes = 5 * 1024 * 1024;
+                if (model.Photo.ContentLength > maxBytes)
+                {
+                    ModelState.AddModelError("Photo", "Image is too large (max 5 MB).");
+                    return View(model);
+                }
+
+                // 3) Read and convert to data URL to preview without saving to disk
+                using (var ms = new MemoryStream())
+                {
+                    model.Photo.InputStream.CopyTo(ms);
+                    var bytes = ms.ToArray();
+                    var base64 = Convert.ToBase64String(bytes);
+                    var mime = contentType == "image/jpg" ? "image/jpeg" : contentType;
+                    photoDataUrl = $"data:{mime};base64,{base64}";
+                }
+            }
+
+            // Calculate emissions
             var result = _recognitionService.CalculateEmissions(model.Material, model.WeightKg);
 
             var resultVm = new RecognitionResultViewModel
@@ -50,25 +87,20 @@ namespace GreenCycle.Controllers
                 EmissionsMinKg = result.EmissionsMinKg,
                 EmissionsMaxKg = result.EmissionsMaxKg,
                 EmissionsAvgKg = result.EmissionsAvgKg,
-                Notes = result.Notes
+                Notes = result.Notes,
+                PhotoDataUrl = photoDataUrl
             };
 
-            // PRG: stash the VM then redirect to GET /Recognition/Result
             TempData["result"] = resultVm;
             return RedirectToAction("Result");
         }
 
-        // GET /Recognition/Result  <-- this is what fixes the 404
         [HttpGet]
         public ActionResult Result()
         {
             var vm = TempData["result"] as RecognitionResultViewModel;
-            if (vm == null)
-            {
-                // User hit /Recognition/Result directly (no POST first)
-                return RedirectToAction("Index");
-            }
-            return View(vm); // Views/Recognition/Result.cshtml
+            if (vm == null) return RedirectToAction("Index");
+            return View(vm);
         }
     }
 }
