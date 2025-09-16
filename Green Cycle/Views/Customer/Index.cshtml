@@ -1,0 +1,56 @@
+@model Green_Cycle.Models.ViewModels.Account.CustomerProfileViewModel
+@{
+    ViewBag.Title = "Customer";
+}
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title mb-3">Customer Details</h3>
+
+                @if (TempData["ProfileSaved"] != null)
+                {
+                    <div class="alert alert-success">Profile saved.</div>
+                }
+
+                @using (Html.BeginForm("Index", "Customer", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.FullName, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Your name" })
+                        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "you@example.com", type = "email" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "e.g. +1 555 123 4567" })
+                        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <a href="@Url.Action("Index", "Recognition")" class="btn btn-outline-secondary ms-2">Try Recognition</a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Your Impact</h5>
+                <p class="lead mb-0">
+                    <strong>@Model.RecognitionCount</strong> recognition(s) completed
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

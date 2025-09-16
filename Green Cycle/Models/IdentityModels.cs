@@ -4,19 +4,29 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Data.Entity;                 // DbSet
-using Green_Cycle.Models.Entities;        // <-- for DropOffPoint
+using System.Data.Entity;                       // DbSet, DbContext
+using Green_Cycle.Models.Entities;              // DropOffPoint, CollectorRoute, RouteStop
 
 namespace Green_Cycle.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        // Name shown in Manage Profile
+        public ApplicationUser()
+        {
+            // Safe defaults for new users
+            JoinedOn = DateTime.UtcNow;
+            RecognitionCount = 0;
+        }
+
         [MaxLength(256)]
         public string FullName { get; set; }
 
-        // Date when the user joined
         public DateTime JoinedOn { get; set; }
+
+        /// <summary>
+        /// Total number of recognitions completed by this user.
+        /// </summary>
+        public int RecognitionCount { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -38,7 +48,21 @@ namespace Green_Cycle.Models
             return new ApplicationDbContext();
         }
 
-        // ✅ App tables
+        // ✅ Application tables
         public DbSet<DropOffPoint> DropOffPoints { get; set; }
+        public DbSet<CollectorRoute> CollectorRoutes { get; set; }
+        public DbSet<RouteStop> RouteStops { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Ensure all DateTimes use datetime2 in SQL (wider range)
+            modelBuilder.Properties<DateTime>()
+                        .Configure(c => c.HasColumnType("datetime2"));
+
+            modelBuilder.Properties<DateTime?>()
+                        .Configure(c => c.HasColumnType("datetime2"));
+        }
     }
 }

@@ -2,13 +2,18 @@
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using GreenCycle.Models.Entities;          // for MaterialType
+using GreenCycle.Models.Entities;                  // MaterialType
 using GreenCycle.Models.ViewModels;
 using GreenCycle.Services.Interfaces;
 using GreenCycle.Services.Implementations;
 
+// added:
+using Microsoft.AspNet.Identity;                   // GetUserId()
+using Green_Cycle.Models;                          // ApplicationDbContext
+
 namespace GreenCycle.Controllers
 {
+    [Authorize] // require login to use recognition + count it per profile
     public class RecognitionController : Controller
     {
         private readonly IRecognitionService _recognitionService;
@@ -90,6 +95,30 @@ namespace GreenCycle.Controllers
                 Notes = result.Notes,
                 PhotoDataUrl = photoDataUrl
             };
+
+            // 🔢 Increment the signed-in user's recognition counter
+            //    (requires you added `public int RecognitionCount { get; set; }` to ApplicationUser)
+            try
+            {
+                if (User?.Identity?.IsAuthenticated == true)
+                {
+                    var userId = User.Identity.GetUserId();
+                    using (var db = new ApplicationDbContext())
+                    {
+                        var user = db.Users.Find(userId);
+                        if (user != null)
+                        {
+                            user.RecognitionCount += 1;
+                            db.SaveChanges();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Swallow/log as needed; don't block the UX on counting errors
+                // You can inject a logger and record the exception here.
+            }
 
             TempData["result"] = resultVm;
             return RedirectToAction("Result");

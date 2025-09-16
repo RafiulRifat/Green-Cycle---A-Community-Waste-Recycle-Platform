@@ -1,0 +1,156 @@
+﻿@model Green_Cycle.Areas.Admin.Controllers.AdminDashboardVm
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">Impact overview and key performance metrics</h2>
+
+    <!-- KPI Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm text-center">
+                <h6>Total PickUps</h6>
+                <h2>@Model.TotalPickups</h2>
+                <small class="text-muted">this month</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm text-center">
+                <h6>Materials Deposits</h6>
+                <h2>@Model.MaterialsDeposits</h2>
+                <small class="text-danger">↓ 4.5%</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm text-center">
+                <h6>Materials Collected</h6>
+                <h2>@Model.MaterialsCollectedTons t</h2>
+                <small class="text-danger">–10.5%</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm text-center">
+                <h6>Points Issued</h6>
+                <h2>@Model.PointsIssued.ToString("N0") pts</h2>
+                <small class="text-success">↑ 11.2%</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h6>Materials Collected Over Time</h6>
+                <canvas id="materialsChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h6>Collection by Channel <small class="text-muted">Last 30 days</small></h6>
+                <canvas id="channelChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity + Issues -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h6>Recent Activity</h6>
+                <ul class="list-unstyled">
+                    @foreach (var a in Model.RecentActivities)
+                    {
+                        <li class="mb-2">
+                            <i class="bi bi-clock-history me-2"></i>
+                            @a.Text <small class="text-muted">@a.TimeAgo</small>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h6>Open Issues</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>ID</th><th>Type</th><th>Description</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Issues)
+                        {
+                            <tr>
+                                <td>@i.Id</td>
+                                <td>@i.Type</td>
+                                <td>@i.Description</td>
+                                <td>
+                                    @if (i.Status == "Open")
+                                    {
+                                        <span class="badge bg-danger">Open</span>
+                                    }
+                                    else if (i.Status.Contains("Progress"))
+                                    {
+                                        <span class="badge bg-warning text-dark">In Progress</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">@i.Status</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <a href="@Url.Action("Index", "Issues", new { area = "" })" class="btn btn-outline-primary btn-sm">View All Issues</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Materials Chart
+        const ctx1 = document.getElementById('materialsChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MaterialsOverTime.Select(m => m.Month))),
+                datasets: [
+                    {
+                        label: 'Plastic',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MaterialsOverTime.Select(m => m.Plastic))),
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                    },
+                    {
+                        label: 'Paper',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MaterialsOverTime.Select(m => m.Paper))),
+                        backgroundColor: 'rgba(255, 206, 86, 0.7)'
+                    },
+                    {
+                        label: 'Metal',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MaterialsOverTime.Select(m => m.Metal))),
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                    }
+                ]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Collection by Channel
+        const ctx2 = document.getElementById('channelChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.CollectionByChannel.Keys)),
+                datasets: [{
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.CollectionByChannel.Values)),
+                    backgroundColor: ['rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)']
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    </script>
+}
