@@ -172,7 +172,23 @@
     <Compile Include="Data\Migrations\202509121752179_Add_Zones_And_Machines.Designer.cs">
       <DependentUpon>202509121752179_Add_Zones_And_Machines.cs</DependentUpon>
     </Compile>
+    <Compile Include="Data\Migrations\202509141747201_InitData.cs" />
+    <Compile Include="Data\Migrations\202509141747201_InitData.Designer.cs">
+      <DependentUpon>202509141747201_InitData.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Migrations\202509141754517_InitData1.cs" />
+    <Compile Include="Data\Migrations\202509141754517_InitData1.Designer.cs">
+      <DependentUpon>202509141754517_InitData1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Migrations\202509160035221_SyncModels.cs" />
+    <Compile Include="Data\Migrations\202509160035221_SyncModels.Designer.cs">
+      <DependentUpon>202509160035221_SyncModels.cs</DependentUpon>
+    </Compile>
     <Compile Include="Data\Migrations\Configuration.cs" />
+    <Compile Include="IdentityMigrations\202509141746433_InitIdentity.cs" />
+    <Compile Include="IdentityMigrations\202509141746433_InitIdentity.Designer.cs">
+      <DependentUpon>202509141746433_InitIdentity.cs</DependentUpon>
+    </Compile>
     <Compile Include="IdentityMigrations\Configuration.cs" />
     <Compile Include="Infrastructure\Filters\AdminOnlyAttribute.cs" />
     <Compile Include="Infrastructure\Mapping\AutoMapperProfile.cs" />
@@ -434,6 +450,18 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\Migrations\202509121752179_Add_Zones_And_Machines.resx">
       <DependentUpon>202509121752179_Add_Zones_And_Machines.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Migrations\202509141747201_InitData.resx">
+      <DependentUpon>202509141747201_InitData.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Migrations\202509141754517_InitData1.resx">
+      <DependentUpon>202509141754517_InitData1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Migrations\202509160035221_SyncModels.resx">
+      <DependentUpon>202509160035221_SyncModels.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IdentityMigrations\202509141746433_InitIdentity.resx">
+      <DependentUpon>202509141746433_InitIdentity.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202509031600424_InitialCreate.resx">
       <DependentUpon>202509031600424_InitialCreate.cs</DependentUpon>
