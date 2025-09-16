@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Security.Claims;
-using Green_Cycle.App_Start;          // ✅ for IdentitySeed.EnsureRolesAndAdminAsync()
 using Green_Cycle.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -23,9 +22,8 @@ namespace Green_Cycle
 
             ConfigureAuth(app);
 
-            // ✅ Seed roles (Admin/Collector/User) and optional default admin
-            //    (See IdentitySeed class we added earlier)
-            IdentitySeed.EnsureRolesAndAdminAsync().GetAwaiter().GetResult();
+            // ❌ Do NOT call IdentitySeed here; it runs before EF migrations.
+            // Seeding should happen in EF Configuration.Seed() after Update-Database.
         }
 
         public void ConfigureAuth(IAppBuilder app)
@@ -38,7 +36,7 @@ namespace Green_Cycle
 
                 // Cookie hardening
                 CookieHttpOnly = true,
-                CookieSecure = CookieSecureOption.Always,     // require HTTPS
+                CookieSecure = CookieSecureOption.Always,
                 CookieSameSite = Microsoft.Owin.SameSiteMode.Lax,
 
                 // Session behavior
@@ -57,19 +55,12 @@ namespace Green_Cycle
             // External sign-in cookie (used during social/OAuth flows)
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
-            // Two-factor cookies (optional to use, already supported by our UserManager)
+            // Two-factor cookies (optional)
             app.UseTwoFactorSignInCookie(DefaultAuthenticationTypes.TwoFactorCookie, TimeSpan.FromMinutes(5));
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
             // OPTIONAL: If you rely on AntiForgery tokens, set unique claim
             // System.Web.Helpers.AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.NameIdentifier;
-
-            // Enable after adding keys to Web.config (AppSettings: GoogleClientId/GoogleClientSecret)
-            // app.UseGoogleAuthentication(new Microsoft.Owin.Security.Google.GoogleOAuth2AuthenticationOptions
-            // {
-            //     ClientId = System.Configuration.ConfigurationManager.AppSettings["GoogleClientId"],
-            //     ClientSecret = System.Configuration.ConfigurationManager.AppSettings["GoogleClientSecret"]
-            // });
         }
     }
 }

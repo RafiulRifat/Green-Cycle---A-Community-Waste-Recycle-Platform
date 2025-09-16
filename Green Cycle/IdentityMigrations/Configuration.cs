@@ -1,11 +1,10 @@
 ﻿namespace Green_Cycle.IdentityMigrations
 {
-    using System;
-    using System.Data.Entity;
     using System.Data.Entity.Migrations;
-    using System.Linq;
+    using Green_Cycle.App_Start;   // ✅ to access IdentitySeed
+    using Green_Cycle.Models;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<Green_Cycle.Models.ApplicationDbContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>
     {
         public Configuration()
         {
@@ -13,12 +12,13 @@
             MigrationsDirectory = @"IdentityMigrations";
         }
 
-        protected override void Seed(Green_Cycle.Models.ApplicationDbContext context)
+        protected override void Seed(ApplicationDbContext context)
         {
-            //  This method will be called after migrating to the latest version.
-
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method
-            //  to avoid creating duplicate seed data.
+            // ✅ This runs after Update-Database completes.
+            // Ensures roles & default admin account exist
+            IdentitySeed.EnsureRolesAndAdminAsync()
+                        .GetAwaiter()
+                        .GetResult();
         }
     }
 }
