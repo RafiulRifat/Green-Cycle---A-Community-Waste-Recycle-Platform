@@ -1,144 +1,121 @@
 ﻿@model GreenCycle.Models.ViewModels.RecognitionResultViewModel
 @{
-    ViewBag.Title = "Recognition Result";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Emission Result";
 }
+
 <style>
-    .result-wrap {
-        max-width: 980px;
-        margin: 30px auto;
-        padding: 24px;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        background: #fff;
-        font-family: system-ui,Arial;
+    .gcv-hero {
+        background: linear-gradient(135deg,#047857,#059669);
+        color: #fff;
+        padding: 26px 22px;
+        border-radius: 18px;
+        box-shadow: 0 12px 24px rgba(4,120,87,.25);
+        margin-bottom: 22px
     }
 
-    .result-grid {
-        display: grid;
-        grid-template-columns: 1fr 1.3fr;
-        gap: 28px;
-    }
-
-    .preview {
-        background: #eef9f0;
-        border-radius: 12px;
-        min-height: 320px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .preview img {
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 12px;
+        .gcv-hero h2 {
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: .3px
         }
 
-    .label {
-        font-size: 28px;
-        font-weight: 800;
-        margin: 0 0 8px;
+        .gcv-hero p {
+            margin: 6px 0 0;
+            opacity: .95
+        }
+
+    .gcv-card {
+        background: #fff;
+        border: 1px solid #b7ead1;
+        border-radius: 18px;
+        box-shadow: 0 10px 18px rgba(0,0,0,.04);
+        padding: 20px
     }
 
-    .badge {
-        padding: 4px 10px;
+    .table.gcv-table {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #b7ead1
+    }
+
+        .table.gcv-table > thead > tr > th {
+            background: #e6f9ef;
+            color: #073b2d;
+            border-color: #b7ead1;
+            font-weight: 700
+        }
+
+        .table.gcv-table > tbody > tr > th {
+            background: #e6f9ef;
+            color: #0c4a3a;
+            width: 40%;
+            border-color: #b7ead1
+        }
+
+        .table.gcv-table > tbody > tr > td {
+            border-color: #b7ead1
+        }
+
+    .gcv-btn {
+        background: #047857;
+        border: 1px solid #065f46;
+        color: #fff !important;
+        font-weight: 600;
+        padding: 10px 18px;
         border-radius: 999px;
-        font-size: 13px;
-        display: inline-block;
-        margin-right: 6px;
+        transition: transform .08s ease,box-shadow .2s ease,background .2s ease;
+        box-shadow: 0 8px 16px rgba(4,120,87,.25)
     }
 
-    .badge-blue {
-        background: #e0f2fe;
-        color: #0369a1;
+        .gcv-btn:hover, .gcv-btn:focus {
+            background: #065f46;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 18px rgba(4,120,87,.3)
+        }
+
+    .gcv-note {
+        color: #0c4a3a;
+        opacity: .85
     }
 
-    .badge-green {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .impact {
-        margin-top: 12px;
-        padding: 8px 12px;
-        background: #e6f9ef;
-        color: #166534;
-        border-radius: 8px;
-        display: inline-block;
-    }
-
-    .section-title {
-        margin-top: 14px;
-        font-weight: 700;
-    }
-
-    .btnrow {
-        margin-top: 20px;
-        display: flex;
-        gap: 14px;
-    }
-
-    .btn {
-        padding: 12px 20px;
-        border-radius: 10px;
-        border: 1px solid #cbd5e1;
-        text-decoration: none;
-        color: #111;
-    }
-
-    .btn-primary {
-        background: #0a7a3f;
-        color: #fff;
-        border: none;
-    }
-
-    .footer {
-        margin-top: 10px;
-        color: #6b7280;
-        font-size: 12px;
+    .gcv-photo {
+        border-radius: 14px;
+        border: 1px solid #b7ead1;
+        box-shadow: 0 6px 14px rgba(0,0,0,.06);
+        max-width: 360px;
+        height: auto
     }
 </style>
 
-<div class="result-wrap">
-    <h2>Recognition Result</h2>
-    <div class="result-grid">
-        <div class="preview">
-            @if (!string.IsNullOrEmpty(Model.PreviewImagePath))
-            {
-                <img src="@Model.PreviewImagePath" alt="Preview" />
-            }
-            else
-            {
-                <span>Preview</span>
-            }
+<div class="gcv-hero">
+    <h2>Emission Result</h2>
+    <p>Your estimated footprint for this material and weight.</p>
+</div>
+
+<div class="gcv-card">
+    <table class="table gcv-table">
+        <thead>
+            <tr><th>Field</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            <tr><th>Material</th><td>@Model.Material</td></tr>
+            <tr><th>Weight (kg)</th><td>@Model.WeightKg</td></tr>
+            <tr><th>Emission factor range (kg CO₂e / kg)</th><td>@Model.FactorMinKgPerKg – @Model.FactorMaxKgPerKg</td></tr>
+            <tr><th>Total emissions (min – max kg CO₂e)</th><td>@Model.EmissionsMinKg – @Model.EmissionsMaxKg</td></tr>
+            <tr><th style="font-weight:800;">Total emissions (average kg CO₂e)</th><td><strong style="font-size:1.15em;">@Model.EmissionsAvgKg</strong></td></tr>
+        </tbody>
+    </table>
+
+    @if (!string.IsNullOrEmpty(Model.PhotoDataUrl))
+    {
+        <div style="margin-top:16px;">
+            <p class="gcv-note">Uploaded photo:</p>
+            <img src="@Model.PhotoDataUrl" alt="Uploaded photo" class="gcv-photo" />
         </div>
-        <div>
-            <div class="label">@Model.Label</div>
-            <div>
-                <span class="badge badge-blue">@($"{Model.Confidence:P0}")</span>
-                <span class="badge badge-green">@Model.Material</span>
-            </div>
+    }
 
-            <div class="impact">You saved @Model.SavedCO2.ToString("0.00") kg CO₂</div>
-
-            <div class="section-title">What to do</div>
-            <ul>
-                @foreach (var step in Model.Instructions)
-                {
-                    <li>@step</li>
-}
-            </ul>
-
-            <div class="footer">
-                Scanned: @Model.ScannedAt.ToString("MMM dd, yyyy, HH:mm")<br />
-                <a href="#">How we estimate CO₂</a>
-            </div>
-
-            <div class="btnrow">
-                <a href="@Url.Action("Index","Recognition")" class="btn">Scan Another</a>
-                <a href="@Url.Action("Impact","Dashboard")" class="btn btn-primary">View Impact Dashboard</a>
-            </div>
-        </div>
+    <div style="margin-top:18px;">
+        @Html.ActionLink("Calculate another", "Index", "Recognition", null, new { @class = "gcv-btn" })
     </div>
 </div>

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GreenCycle.Models.Entities;
 
-namespace Green_Cycle.Services.Interfaces
+namespace GreenCycle.Services.Interfaces
 {
-    internal interface IRecognitionService
+    public interface IRecognitionService
     {
+        /// <summary>
+        /// Calculates CO2e emissions for a given material and weight.
+        /// </summary>
+        RecognitionResult CalculateEmissions(MaterialType material, decimal weightKg);
     }
 }
