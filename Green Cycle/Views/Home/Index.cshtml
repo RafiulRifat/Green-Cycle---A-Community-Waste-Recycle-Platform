@@ -16,54 +16,11 @@
         </div>
     </div>
     <div class="col-lg-6 text-center">
-        <!-- Inline SVG illustration instead of hero.png -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-             class="img-fluid hero-illustration" role="img" aria-label="Recycling illustration">
-            <style>
-                .skin {
-                    fill: #f9c9b6;
-                }
-
-                .shirt {
-                    fill: #198754;
-                }
-
-                .pants {
-                    fill: #1a1a1a;
-                }
-
-                .hair {
-                    fill: #0a0a0a;
-                }
-
-                .bin {
-                    fill: #198754;
-                }
-
-                .icon {
-                    fill: #ffffff;
-                }
-            </style>
-            <!-- Background circle -->
-            <circle cx="256" cy="256" r="256" fill="#f6fff8" />
-            <!-- Head -->
-            <circle class="skin" cx="280" cy="140" r="40" />
-            <!-- Hair -->
-            <path class="hair" d="M320 140c0 22-18 40-40 40s-40-18-40-40c0-25 20-45 45-45s35 20 35 45z" />
-            <!-- Body -->
-            <rect class="shirt" x="220" y="180" width="120" height="80" rx="20" />
-            <!-- Pants -->
-            <rect class="pants" x="220" y="260" width="40" height="120" />
-            <rect class="pants" x="300" y="260" width="40" height="120" />
-            <!-- Phone -->
-            <rect x="200" y="160" width="20" height="40" rx="3" fill="#fff" stroke="#000" stroke-width="2" />
-            <!-- Recycling Bin -->
-            <rect class="bin" x="360" y="260" width="100" height="120" rx="8" />
-            <!-- Recycling Symbol -->
-            <polygon class="icon" points="410,300 430,340 390,340" />
-            <polygon class="icon" points="430,320 450,360 410,360" />
-            <polygon class="icon" points="390,360 430,360 410,400" />
-        </svg>
+        <!-- Replaced SVG with image -->
+        <img src="@Url.Content("~/Content/images/recycle-girl.png")"
+             alt="Recycle with phone"
+             class="img-fluid rounded-4 shadow-sm"
+             style="max-height: 380px; object-fit: contain;" />
     </div>
 </section>
 
@@ -92,6 +49,83 @@
     <div class="col-md-4"><div class="stat-number">@Model.ItemsRecycled</div> <div class="text-muted">Items Recycled</div></div>
     <div class="col-md-4"><div class="stat-number">@Model.ChallengesJoined</div> <div class="text-muted">Challenges Joined</div></div>
 </section>
+
+<!-- About Section -->
+<section class="row bg-white rounded-4 shadow-sm p-4 p-lg-5 mt-4">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold">About Us</h2>
+        <p class="lead text-muted">
+            Our vision is to build a sustainable future by enabling communities to
+            identify, track, and recycle waste efficiently.
+            Together, we aim to create a cleaner, greener tomorrow.
+        </p>
+    </div>
+
+    <!-- Leadership Profiles -->
+    <div class="row text-center g-4">
+        <div class="col-md-3">
+            <div class="about-card p-3 rounded-4 shadow-sm">
+                <img src="@Url.Content("~/Content/images/ceo.png")" alt="CEO"
+                     class="img-fluid rounded-circle mb-3 profile-pic" />
+                <h5 class="fw-semibold">MD Rafiul Siddique</h5>
+                <p class="text-success m-0">Chief Executive Officer (CEO)</p>
+                <p class="text-muted small">ID: 20210204079</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="about-card p-3 rounded-4 shadow-sm">
+                <img src="@Url.Content("~/Content/images/coo.png")" alt="COO"
+                     class="img-fluid rounded-circle mb-3 profile-pic" />
+                <h5 class="fw-semibold">Umme Marium Prity</h5>
+                <p class="text-success m-0">Chief Operating Officer (COO)</p>
+                <p class="text-muted small">ID: 20210204098</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="about-card p-3 rounded-4 shadow-sm">
+                <img src="@Url.Content("~/Content/images/cfo.png")" alt="CFO"
+                     class="img-fluid rounded-circle mb-3 profile-pic" />
+                <h5 class="fw-semibold">Abdullah Al Jeshan</h5>
+                <p class="text-success m-0">Chief Financial Officer (CFO)</p>
+                <p class="text-muted small">ID: 20210104090</p>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="about-card p-3 rounded-4 shadow-sm">
+                <img src="@Url.Content("~/Content/images/cmo.png")" alt="CMO"
+                     class="img-fluid rounded-circle mb-3 profile-pic" />
+                <h5 class="fw-semibold">Mahade Hasan</h5>
+                <p class="text-success m-0">Chief Marketing Officer (CMO)</p>
+                <p class="text-muted small">ID: 20210204095</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Extra CSS for Hover Effects -->
+<style>
+    .about-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #ffffff;
+    }
+
+        .about-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+    .profile-pic {
+        max-height: 150px;
+        transition: transform 0.3s ease;
+    }
+
+    .about-card:hover .profile-pic {
+        transform: rotate(-2deg) scale(1.05);
+    }
+</style>
 
 <!-- Events & Posts -->
 <section class="row mt-4 g-4">

@@ -336,7 +336,12 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\images\ceo.png" />
+    <Content Include="Content\images\cfo.png" />
+    <Content Include="Content\images\cmo.png" />
+    <Content Include="Content\images\coo.png" />
     <Content Include="Content\images\logo.png" />
+    <Content Include="Content\images\recycle-girl.png" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\app\validation.js" />
